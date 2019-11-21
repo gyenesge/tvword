@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="display" type="home.gabe.tvword.model.Display"*/-->
+<!--/*@thymesVar id="autostart" type="java.lang.Boolean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${display.name}">Display Name</title>
+</head>
+
+<h1 th:text="${display.name}">Display Name</h1>
+<p th:text="${display.note}">Details of the display</p>
+<p>
+    <input id="autostart" th:checked="${autostart}" type="checkbox"/>
+    <label for="autostart">Autostart display next time</label>
+</p>
+<p>
+    <button onclick="javascript:startDisplay()" type="button">Start display</button>
+    <button onclick="javascript:logout()" type="button">Logout</button>
+</p>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>
+<script type="application/javascript">
+    function logout() {
+        // start display sequence
+        var url = '/perform_logout';
+        window.open(url, '_self');
+    }
+
+    function startDisplay() {
+        //save cookie state
+        var newRemember = $('#autostart').is(":checked");
+        setCookie("autostart", newRemember, 365);
+
+        // start display sequence
+        var url = '/displays/next';
+        window.open(url, '_self');
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Display List</title>
+</head>
+<body>
+
+<h1>List of Displays</h1>
+<table>
+    <thead>
+    <th>Name</th>
+    <th>Note</th>
+    <th>Campaigns</th>
+    </thead>
+    <tbody>
+    <tr th:each="display : ${displays}">
+        <td th:text="${display.name}">Display</td>
+        <td th:text="${display.note}">Description of display 1</td>
+        <td th:text="${display.campaigns.size()}">4</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
