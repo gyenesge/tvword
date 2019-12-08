@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>No Campaign</title>
+    <title th:text="#{title.noCampaign}">No Campaign</title>
 </head>
 <body>
-<h1>Campaign not found for this device.</h1>
-<p>You can logout and login in with a different display that has any campaign configured. Alternatively you can contact
+<h1 th:text="#{error.noCampaign}">Campaign not found for this device.</h1>
+<p th:text="#{msg.noCampaign}">You can logout and login in with a different display that has any campaign configured.
+    Alternatively you can contact
     the administrator to load some content for this display.</p>
 <p>
-    <button onclick="javascript:window.open('/perform_logout', '_self')" type="button">Logout</button>
+    <button onclick="javascript:window.open('/perform_logout', '_self')" th:text="#{button.logout}" type="button">
+        Logout
+    </button>
 </p>
 </body>
 </html>

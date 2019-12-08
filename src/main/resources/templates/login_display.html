@@ -3,30 +3,30 @@
 <!--/*@thymesVar id="error" type="java.lang.Boolean"*/-->
 <head>
     <meta charset="UTF-8">
-    <title>Display Login</title>
+    <title th:text="#{title.login}">Display Login</title>
 </head>
 <body>
-<h1>Display Login</h1>
-<div th:if="${error}">Invalid login ID or password.</div>
+<h1 th:text="#{title.login}">Display Login</h1>
+<div th:if="${error}" th:text="#{error.invalidLogin}">Invalid login ID or password.</div>
 
 <form action="/perform_login" method='POST' name='f'>
     <table>
         <tr>
-            <td>User:</td>
+            <td th:text="#{label.user}">User:</td>
             <td><input name='username' type='text' value=''></td>
         </tr>
         <tr>
-            <td>Password:</td>
+            <td th:text="#{label.password}">Password:</td>
             <td><input name='password' type='password'/></td>
         </tr>
 
         <tr>
-            <td>Remember Me:</td>
+            <td th:text="#{label.rememberMe}">Remember Me:</td>
             <td><input name="remember-me" type="checkbox"/></td>
         </tr>
 
         <tr>
-            <td><input name="submit" type="submit" value="submit"/></td>
+            <td><input name="submit" th:value="#{button.login}" type="submit"/></td>
         </tr>
     </table>
 </form>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="layout (template, menu)" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="template" type="java.lang.String"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <title th:text="#{title.admin}">TVWord Admin</title>
+</head>
+<body>
+
+<div>
+    | <a href="/admin/displays" th:text="#{menu.manageDisplays}">Manage Displays</a> |
+    <a href="/admin/campaigns" th:text="#{menu.manageCampaigns}">Manage Campaigns</a> |
+</div>
+
+<div class="container-fluid">
+    <div class="container xd-container">
+
+        <th:block th:include="${template}"/>
+
+        <br/>
+        <br/>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
+</body>
+</html>

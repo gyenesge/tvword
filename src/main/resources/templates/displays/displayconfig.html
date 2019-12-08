@@ -11,11 +11,11 @@
 <p th:text="${display.note}">Details of the display</p>
 <p>
     <input id="autostart" th:checked="${autostart}" type="checkbox"/>
-    <label for="autostart">Autostart display next time</label>
+    <label for="autostart" th:text="#{label.autostart}">Autostart display next time</label>
 </p>
 <p>
-    <button onclick="javascript:startDisplay()" type="button">Start display</button>
-    <button onclick="javascript:logout()" type="button">Logout</button>
+    <button onclick="javascript:startDisplay()" th:text="#{button.startDisplay}" type="button">Start display</button>
+    <button onclick="javascript:logout()" th:text="#{button.logout}" type="button">Logout</button>
 </p>
 
 <script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>

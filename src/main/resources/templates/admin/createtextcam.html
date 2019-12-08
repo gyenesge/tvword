@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'campaigns')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.createTextCampaign}">Create Text Campaign</title>
+</head>
+<body>
+<h1 th:text="#{title.createTextCampaign}">Create Text Campaign</h1>
+<form>
+    <table>
+        <tr>
+            <td><label for="name" th:text="#{label.name}">Name: </label></td>
+            <td><input id="name"/></td>
+        </tr>
+        <tr>
+            <td><label for="startDate" th:text="#{label.startDate}">Start date: </label></td>
+            <td><input id="startDate"/></td>
+        </tr>
+        <tr>
+            <td><label for="endDate" th:text="#{label.endDate}">End date: </label></td>
+            <td><input id="endDate"/></td>
+        </tr>
+        <tr>
+            <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
+            <td>
+                <div><input name="displaysEnabled" th:value="1" type="checkbox"/> <label th:text="${'Display 1'}">Display
+                    1</label></div>
+                <div><input name="displaysEnabled" th:value="2" type="checkbox"/> <label th:text="${'Display 2'}">Display
+                    2</label></div>
+            </td>
+        </tr>
+        <tr>
+            <td><label for="text" th:text="#{label.text}">Text to display: </label></td>
+            <td><textarea id="text"></textarea></td>
+        </tr>
+        <tr>
+            <td><label for="fontColor" th:text="#{label.fontColor}">Font color: </label></td>
+            <td><input id="fontColor"/></td>
+        </tr>
+        <tr>
+            <td><label for="bkgColor" th:text="#{label.bkgColor}">Background color: </label></td>
+            <td><input id="bkgColor"/></td>
+        </tr>
+        <tr>
+            <td><input id="submit" th:value="#{button.create}" type="submit"></td>
+            <td><a href="javascript:history.back()" th:text="#{link.cancel}">Cancel</a></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

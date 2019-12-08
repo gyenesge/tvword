@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Missing Page</title>
+    <title th:text="#{title.missingPage}">Missing Page</title>
 </head>
 <body>
-<h1>The requested page does not exists.</h1>
-<p>You can start a display: <a href="/displays/start">start display</a>...</p>
-<p>Or you can start administering stuff: <a href="/admin/index">admin index page</a></p>
+<h1 th:text="#{error.missingPage}">The requested page does not exists.</h1>
+<p><span th:text="#{msg.startDisplay}">You can start a display: </span><a href="/displays/start"
+                                                                          th:text="#{link.startDisplay}">start
+    display</a></p>
+<p><span th:text="#{msg.startAdmin}">Or you can start administering stuff: </span><a href="/admin/displays"
+                                                                                     th:text="#{link.startAdmin}">admin
+    index page</a></p>
 </body>
 </html>

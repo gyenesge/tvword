@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'campaigns')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.modifyCampaign}">Modify Campaign</title>
+</head>
+<body>
+<h1 th:text="#{title.modifyCampaign}">Modify Campaign</h1>
+<form>
+    <table>
+        <tr>
+            <td><label th:text="#{label.id}">ID: </label></td>
+            <td><span th:text="${'1'}">1</span></td>
+        </tr>
+        <tr>
+            <td><label for="name" th:text="#{label.name}">Name: </label></td>
+            <td><input id="name" th:value="${'Display 1'}"/></td>
+        </tr>
+        <tr>
+            <td><label for="startDate" th:text="#{label.startDate}">Start date: </label></td>
+            <td><input id="startDate" th:value="${'2019-12-01'}"/></td>
+        </tr>
+        <tr>
+            <td><label for="endDate" th:text="#{label.endDate}">End date: </label></td>
+            <td><input id="endDate" th:value="${'2020-01-01'}"/></td>
+        </tr>
+        <tr>
+            <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
+            <td>
+                <div><input checked name="displaysEnabled" th:value="1" type="checkbox"/> <label
+                        th:text="${'Display 1'}">Display 1</label></div>
+                <div><input name="displaysEnabled" th:value="2" type="checkbox"/> <label th:text="${'Display 2'}">Display
+                    2</label></div>
+            </td>
+        </tr>
+        <tr>
+            <td><label for="status" th:text="#{label.status}">Status: </label></td>
+            <td><select id="status">
+                <option th:selected="true" th:text="#{status.active}" th:value="A">Active</option>
+                <option th:text="#{status.deleted}" th:value="D">Deleted</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td><input id="submit" th:value="#{button.save}" type="submit"></td>
+            <td><a href="javascript:history.back()" th:text="#{link.cancel}">Cancel</a></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

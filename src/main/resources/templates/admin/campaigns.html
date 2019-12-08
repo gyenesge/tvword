@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.campagins}">Campaigns</title>
+</head>
+<body>
+<h1 th:text="#{title.campagins}">Campaigns</h1>
+
+<p th:text="#{msg.campaigns}">Here you can find campaigns already defined for your organization:</p>
+<p>
+    <span th:text="#{label.filters}">Filters:</span>
+    <select>
+        <option th:text="#{item.allDisplays}">all displays</option>
+        <option>Display 1</option>
+        <option>Display 2</option>
+    </select>
+</p>
+<table border="1px">
+    <thead>
+    <th th:text="#{header.id}">ID</th>
+    <th th:text="#{header.name}">Name</th>
+    <th th:text="#{header.type}">Type</th>
+    <th th:tex="#{header.display}">Display</th>
+    <th th:text="#{header.status}">Status</th>
+    <th th:text="#{header.actions}">Actions</th>
+    </thead>
+    <tr>
+        <td>5</td>
+        <td>Campaign 5</td>
+        <td>image</td>
+        <td>
+            <div>Display 1</div>
+            <div>Display 2</div>
+        </td>
+        <td>Active</td>
+        <td><a href="/admin/campaigns/modify" th:text="#{link.modify}">Modify</a></td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>Old Campaign</td>
+        <td>image</td>
+        <td>
+            <div>Display 1</div>
+        </td>
+        <td>Deleted</td>
+        <td><a href="/admin/campaigns/modify" th:text="#{link.modify}">Modify</a></td>
+    </tr>
+</table>
+
+<p>
+<div style="border: 1px; border-color: black">
+    <span th:text="#{label.selectType}">Select type to create:</span>
+    <a href="/admin/campaigns/create/text" th:text="#{link.createTextCampaign}">Text Campaign</a> |
+    <a href="/admin/campaigns/create/picture" th:text="#{link.createPictureCampaign}">Picture Campaign</a>
+</div>
+</p>
+
+</body>
+</html>
