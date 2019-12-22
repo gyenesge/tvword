@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
+<!--/*@thymesVar id="checked" type="java.lang.Boolean"*/-->
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title.displayList}">Displays</title>
@@ -8,28 +10,38 @@
 <h1 th:text="#{title.displayList}">Displays</h1>
 
 <p th:text="#{msg.displayList}">Here you can find displays already defined for your organization:</p>
+<p><input id="showDeleted" th:checked="${checked}" type="checkbox"/><span th:text="#{msg.showDeleted}">Show deleted elements</span>
+</p>
 <table border="1px">
     <thead>
     <th th:text="#{header.id}">ID</th>
     <th th:text="#{header.name}">Name</th>
     <th th:text="#{header.note}">Note</th>
+    <th th:text="#{header.status}">Status</th>
     <th th:text="#{header.actions}">Actions</th>
     </thead>
-    <tr>
-        <td>1</td>
-        <td>Community Room</td>
-        <td>This is the first display in the row</td>
-        <td><a href="/admin/displays/modify" th:text="#{link.modify}">Modify</a></td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>Entrance Door</td>
-        <td>This is the second display in the row</td>
-        <td><a href="/admin/displays/modify" th:text="#{link.modify}">Modify</a></td>
+    <tr th:each="display:${displays}">
+        <td th:text="${display.id}">1</td>
+        <td th:text="${display.name}">Community Room</td>
+        <td th:text="${display.note}">This is the first display in the row</td>
+        <td th:text="#{${'status.'+display.status.getStatusCode()}}">A</td>
+        <td><a th:href="${'/admin/displays/'+display.id+'/modify'}" th:text="#{link.modify}">Modify</a></td>
     </tr>
 </table>
 
 <p><a href="/admin/displays/create" th:text="#{link.createNew}">Create new</a></p>
 
+<script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>
+<script type="application/javascript">
+    $(document).ready(function () {
+        $('#showDeleted').change(function () {
+            var param = '';
+            if (this.checked) {
+                param = "?showDeleted=true";
+            }
+            window.open('/admin/displays' + param, '_self');
+        });
+    });
+</script>
 </body>
 </html>

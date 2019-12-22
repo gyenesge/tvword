@@ -25,6 +25,9 @@ public class Campaign {
     @ManyToMany(mappedBy = "campaigns")
     private Set<Display> displays = new HashSet<>();
 
+    @ManyToOne
+    private Status status = Status.ACTIVE;
+
     public Campaign() {
     }
 
@@ -76,6 +79,14 @@ public class Campaign {
         this.displays = displays;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,6 +113,7 @@ public class Campaign {
                 ", type=" + type +
                 ", name='" + name + '\'' +
                 ", start=" + start +
-                ", expiry=" + expiry;
+                ", expiry=" + expiry +
+                ", status=" + status;
     }
 }

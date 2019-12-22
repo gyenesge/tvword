@@ -24,6 +24,23 @@ public class Status {
         this.description = description;
     }
 
+    public static Status parse(String status) {
+        if (status.equals(ACTIVE.statusCode))
+            return ACTIVE;
+        if (status.equals(DELETED.statusCode))
+            return DELETED;
+
+        throw new IllegalArgumentException("Unknown status code: " + status);
+    }
+
+    public boolean isActive() {
+        return ACTIVE.statusCode.equals(statusCode);
+    }
+
+    public boolean isDeleted() {
+        return DELETED.statusCode.equals(statusCode);
+    }
+
     @Override
     public String toString() {
         return "Status{" +

@@ -48,7 +48,7 @@ public class SecurityController extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login/display")
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/displays/start")
+                .defaultSuccessUrl("/start")
                 .failureUrl("/login/display?error=true")
                 .and()
                 .logout()

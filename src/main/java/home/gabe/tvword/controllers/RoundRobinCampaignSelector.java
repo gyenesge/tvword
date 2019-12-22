@@ -1,6 +1,7 @@
 package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.Campaign;
+import home.gabe.tvword.model.Status;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -31,7 +32,8 @@ public class RoundRobinCampaignSelector implements CampaignSelector {
         Campaign min = null;
         for (Campaign campaign : campaigns) {
 
-            if (campaign.getStart().isAfter(now)
+            if (!campaign.getStatus().equals(Status.ACTIVE)
+                    || campaign.getStart().isAfter(now)
                     || campaign.getExpiry().isBefore(now))
                 continue; // skip expired or not-started campaign
 

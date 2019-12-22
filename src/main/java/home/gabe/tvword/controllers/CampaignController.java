@@ -2,15 +2,12 @@ package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.*;
 import home.gabe.tvword.services.CampaignService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import home.gabe.tvword.services.DisplayService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,16 +16,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 
+@Slf4j
 @Controller
 public class CampaignController {
-    private Logger logger = LoggerFactory.getLogger(DisplayController.class);
 
     private CampaignService campaignService;
+    private DisplayService displayService;
 
-    public CampaignController(CampaignService campaignService) {
+    public CampaignController(CampaignService campaignService, DisplayService displayService) {
         this.campaignService = campaignService;
+        this.displayService = displayService;
     }
-
 
     @RequestMapping("/campaigns/{id}")
     public String getCampaign(@PathVariable Long id,
@@ -39,6 +37,9 @@ public class CampaignController {
         Campaign campaign = campaignService.findById(id);
         if (campaign == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown campaign ID: " + id);
+
+        if (!campaign.getStatus().equals(Status.ACTIVE))
+            throw new IllegalStateException("The selected campaign is not active: " + id);
 
         //validate permission and consistence (e.g. a campaign can be displayed only for authenticated device)
         Display activeDisplay = DisplayController.getDisplay(principal);
@@ -67,5 +68,40 @@ public class CampaignController {
         response.setContentType(image.getFormat());
         InputStream is = new ByteArrayInputStream(image.getContent());
         is.transferTo(response.getOutputStream());
+    }
+
+
+    @RequestMapping("/admin/campaigns")
+    public String getCampaignIndex(Model model, @RequestParam(required = false) String displayId) {
+        Iterable<Campaign> campaigns = null;
+        Long id = null;
+        if (displayId == null)
+            campaigns = campaignService.findAll();
+        else {
+            id = Long.parseLong(displayId);
+            campaigns = campaignService.findByDisplay(id);
+        }
+
+        model.addAttribute("campaigns", campaigns);
+        model.addAttribute("displays", displayService.findAll(false));
+        model.addAttribute("filterDisplay", id);
+        return "/admin/campaigns";
+    }
+
+    @RequestMapping("/admin/campaigns/create/text")
+    public String getTextCampaignCreate() {
+        return "/admin/createtextcam";
+    }
+
+    @RequestMapping("/admin/campaigns/create/picture")
+    public String getPictureCampaignCreate() {
+        return "/admin/createpicturecam";
+    }
+
+    @RequestMapping("/admin/campaigns/{id}/modify")
+    public String getModifyCampaign(Model model, @PathVariable Long id) {
+        model.addAttribute("campaign", campaignService.findById(id));
+        model.addAttribute("displays", displayService.findAll(false));
+        return "/admin/modifycam";
     }
 }

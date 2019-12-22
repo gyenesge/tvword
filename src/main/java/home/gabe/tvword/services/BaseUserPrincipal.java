@@ -68,4 +68,8 @@ public class BaseUserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return user.getStatus().equals(Status.ACTIVE);
     }
+
+    public User getUser() {
+        return user;
+    }
 }

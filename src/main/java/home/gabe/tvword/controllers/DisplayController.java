@@ -2,6 +2,8 @@ package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.Campaign;
 import home.gabe.tvword.model.Display;
+import home.gabe.tvword.model.web.CreateDisplayCommand;
+import home.gabe.tvword.model.web.ModifyDisplayCommand;
 import home.gabe.tvword.services.CampaignService;
 import home.gabe.tvword.services.DisplayPrincipal;
 import home.gabe.tvword.services.DisplayService;
@@ -10,8 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -110,6 +111,54 @@ public class DisplayController {
         model.addAttribute("display", display);
 
         return "/displays/displayconfig";
+    }
+
+
+    @RequestMapping("/admin/displays")
+    public String getDisplayIndex(Model model, @RequestParam(required = false, defaultValue = "false") Boolean showDeleted) {
+        Set<Display> displays = displayService.findAll(showDeleted);
+        model.addAttribute("displays", displays);
+        model.addAttribute("checked", showDeleted);
+        return "/admin/displays";
+    }
+
+    @RequestMapping("/admin/displays/create")
+    public String getCreateDisplay(Model model) {
+
+        model.addAttribute("createDisplayCommand", new CreateDisplayCommand());
+        return "/admin/createdisplay";
+    }
+
+    @PostMapping("/admin/displays/createprocess")
+    public String getCreateDisplayProcess(@ModelAttribute CreateDisplayCommand command) {
+
+        if (!command.getPassword1().equals(command.getPassword2()))
+            throw new IllegalArgumentException("Password missmatch.");
+        displayService.register(command.getName(), command.getNote(), command.getPassword1());
+        return "redirect:/admin/displays";
+    }
+
+    @RequestMapping("/admin/displays/{id}/modify")
+    public String getModifyDisplay(Model model, @PathVariable Long id) {
+        Display display = displayService.findById(id);
+
+        ModifyDisplayCommand command = new ModifyDisplayCommand(id);
+        command.setNote(display.getNote());
+        command.setStatus(display.getStatus().getStatusCode());
+
+        model.addAttribute("display", display);
+        model.addAttribute("command", command);
+        return "/admin/modifydisplay";
+    }
+
+    @PostMapping("/admin/displays/modifyprocess")
+    public String processModify(@ModelAttribute ModifyDisplayCommand command) {
+        if (command.getId() == null)
+            throw new IllegalArgumentException("Invalid command object. Id is not defined.");
+        if (!command.getPassword1().equals(command.getPassword2()))
+            throw new IllegalArgumentException("Password missmatch.");
+        displayService.update(command);
+        return "redirect:/admin/displays";
     }
 
 

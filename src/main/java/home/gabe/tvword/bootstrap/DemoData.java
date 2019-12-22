@@ -90,9 +90,21 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         expText.setStart(LocalDateTime.now().plus(-2, ChronoUnit.MONTHS));
         expText.setExpiry(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
         assign(textDisplay, expText);
+
+        TextCampaign deletedText = new TextCampaign();
+        deletedText.setName("Deleted campaign");
+        deletedText.setText("This is a deleted campaign for display 1.");
+        deletedText.setBkgColor("#008");
+        deletedText.setTextColor("#f0f");
+        deletedText.setStart(LocalDateTime.now().plus(-2, ChronoUnit.MONTHS));
+        deletedText.setExpiry(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
+        deletedText.setStatus(Status.DELETED);
+        assign(textDisplay, deletedText);
+
         campaignRepository.save(text);
         campaignRepository.save(text2);
         campaignRepository.save(expText);
+        campaignRepository.save(deletedText);
         userRepository.save(textDisplay);
 
         Display pictureDisplay = new Display();

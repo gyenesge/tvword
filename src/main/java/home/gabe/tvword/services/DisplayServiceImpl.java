@@ -4,6 +4,7 @@ import home.gabe.tvword.model.Display;
 import home.gabe.tvword.model.Status;
 import home.gabe.tvword.model.User;
 import home.gabe.tvword.model.UserRole;
+import home.gabe.tvword.model.web.ModifyDisplayCommand;
 import home.gabe.tvword.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,12 +42,12 @@ public class DisplayServiceImpl implements DisplayService {
     }
 
     @Override
-    public Set<Display> findAll() {
+    public Set<Display> findAll(boolean showDeleted) {
         Iterable<User> all = userRepository.findByRole(UserRole.DISPLAY);
 
         Set<Display> result = new HashSet<>();
         all.forEach(user -> {
-            if (user.getStatus().equals(Status.ACTIVE) && user instanceof Display)
+            if ((showDeleted || user.getStatus().equals(Status.ACTIVE)) && user instanceof Display)
                 result.add((Display) user);
         });
 
@@ -69,5 +70,24 @@ public class DisplayServiceImpl implements DisplayService {
     @Override
     public void delete(Display display) {
         userRepository.delete(display);
+    }
+
+    @Override
+    public Display update(ModifyDisplayCommand command) {
+        Optional<User> optional = userRepository.findById(command.getId());
+        if (optional.isEmpty() || !(optional.get() instanceof Display))
+            throw new IllegalArgumentException("Unknown display ID: " + command.getId());
+
+        Display display = (Display) optional.get();
+        if (command.getPassword1() != null && command.getPassword1().trim().length() > 0) {
+            if (!command.getPassword1().equals(command.getPassword2()))
+                throw new IllegalArgumentException("Password mismatch.");
+
+            display.setHashedPassword(passwordEncoder.encode(command.getPassword1()));
+        }
+        display.setNote(command.getNote());
+        display.setStatus(Status.parse(command.getStatus()));
+
+        return userRepository.save(display);
     }
 }

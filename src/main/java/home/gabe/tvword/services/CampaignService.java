@@ -9,9 +9,11 @@ public interface CampaignService {
 
     Campaign create(Campaign campaign);
 
-    Iterable<Campaign> findAll();
+    Set<Campaign> findAll();
 
     Set<Campaign> findByDisplay(Display display);
+
+    Set<Campaign> findByDisplay(long displayId);
 
     void delete(Campaign campaign);
 

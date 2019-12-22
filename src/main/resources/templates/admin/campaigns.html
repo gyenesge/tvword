@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
+<!--/*@thymesVar id="campaigns" type="java.util.Set<home.gabe.tvword.model.Campaign>"*/-->
+<!--/*@thymesVar id="filterDisplay" type="java.lang.Long"*/-->
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title.campagins}">Campaigns</title>
@@ -10,13 +13,14 @@
 <p th:text="#{msg.campaigns}">Here you can find campaigns already defined for your organization:</p>
 <p>
     <span th:text="#{label.filters}">Filters:</span>
-    <select>
-        <option th:text="#{item.allDisplays}">all displays</option>
-        <option>Display 1</option>
-        <option>Display 2</option>
+    <select id="displayFilter" onchange="filterList(this)">
+        <option th:text="#{item.allDisplays}" th:value="${-1}">all displays</option>
+        <option th:each="display : ${displays}" th:selected="${display.id == filterDisplay}" th:text="${display.name}"
+                th:value="${display.id}">Display 1
+        </option>
     </select>
 </p>
-<table border="1px">
+<table border="1px" th:if="${!campaigns.isEmpty()}">
     <thead>
     <th th:text="#{header.id}">ID</th>
     <th th:text="#{header.name}">Name</th>
@@ -25,28 +29,19 @@
     <th th:text="#{header.status}">Status</th>
     <th th:text="#{header.actions}">Actions</th>
     </thead>
-    <tr>
-        <td>5</td>
-        <td>Campaign 5</td>
-        <td>image</td>
+    <tr th:each="campaign : ${campaigns}">
+        <td th:text="${campaign.id}">5</td>
+        <td th:text="${campaign.name}">Campaign 5</td>
+        <td th:text="#{${'type.'+campaign.type.type}}">image</td>
         <td>
-            <div>Display 1</div>
-            <div>Display 2</div>
+            <div th:each="display : ${campaign.displays}" th:text="${display.name}">Display 1</div>
         </td>
-        <td>Active</td>
-        <td><a href="/admin/campaigns/modify" th:text="#{link.modify}">Modify</a></td>
-    </tr>
-    <tr>
-        <td>8</td>
-        <td>Old Campaign</td>
-        <td>image</td>
-        <td>
-            <div>Display 1</div>
-        </td>
-        <td>Deleted</td>
-        <td><a href="/admin/campaigns/modify" th:text="#{link.modify}">Modify</a></td>
+        <td th:text="#{${'status.'+campaign.status.getStatusCode()}}">Active</td>
+        <td><a th:href="${'/admin/campaigns/'+campaign.id+'/modify'}" th:text="#{link.modify}">Modify</a></td>
     </tr>
 </table>
+<p th:if="${campaigns.isEmpty()}" th:text="#{msg.noCampaignToList}">There is no campaign available to show. You may
+    consider changing the filters.</p>
 
 <p>
 <div style="border: 1px; border-color: black">
@@ -56,5 +51,15 @@
 </div>
 </p>
 
+<script lang="application/javascript">
+    function filterList(selectComponent) {
+        var displayId = selectComponent.options[selectComponent.selectedIndex].value;
+        var url = '/admin/campaigns';
+        if (displayId >= 0)
+            url = url + '?displayId=' + displayId;
+
+        window.open(url, '_self');
+    }
+</script>
 </body>
 </html>

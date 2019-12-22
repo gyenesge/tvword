@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="createDisplayCommand" type="home.gabe.tvword.model.web.CreateDisplayCommand"*/-->
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title.createDisplay}">Create Display</title>
 </head>
 <body>
 <h1 th:text="#{title.createDisplay}">Create New Display</h1>
-<form>
+<form method="post" th:action="@{/admin/displays/createprocess}" th:object="${createDisplayCommand}">
     <table>
         <tr>
             <td><label for="name" th:text="#{label.displayName}">Name: </label></td>
-            <td><input id="name"/></td>
+            <td><input id="name" th:field="*{name}"/></td>
         </tr>
         <tr>
             <td><label for="note" th:text="#{label.note}">Note: </label></td>
-            <td><input id="note"/></td>
+            <td><textarea id="note" th:field="*{note}"/></td>
+            </td>
         </tr>
         <tr>
             <td><label for="password1" th:text="#{label.password}">Password: </label></td>
-            <td><input id="password1" type="password"/></td>
+            <td><input id="password1" th:field="*{password1}" type="password"/></td>
         </tr>
         <tr>
             <td><label for="password2" th:text="#{label.confirmPassword}">Confirm password: </label></td>
-            <td><input id="password2" type="password"/></td>
+            <td><input id="password2" th:field="*{password2}" type="password"/></td>
         </tr>
         <tr>
             <td><input id="submit" th:value="#{button.create}" type="submit"></td>

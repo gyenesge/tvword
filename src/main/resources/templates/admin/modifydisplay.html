@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!--/*@thymesVar id="display" type="home.gabe.tvword.model.Display"*/-->
+<!--/*@thymesVar id="command" type="home.gabe.tvword.model.web.ModifyDisplayCommand"*/-->
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -6,29 +8,37 @@
 </head>
 <body>
 <h1 th:text="#{title.modifyDisplay}">Modify Display</h1>
-<form>
+<form method="post" th:action="@{/admin/displays/modifyprocess}" th:object="${command}">
     <table>
         <tr>
+            <td><label th:text="#{label.id}">ID: </label></td>
+            <td><label th:text="${display.id}">1</label><input id="id" th:field="*{id}" type="hidden"/></td>
+        </tr>
+        <tr>
             <td><label th:text="#{label.displayName}">Name: </label></td>
-            <td><label th:text="TBD"/>Display 1</td>
+            <td><label th:text="${display.name}">Display 1</label></td>
         </tr>
         <tr>
             <td><label for="note" th:text="#{label.note}">Note: </label></td>
-            <td><input id="note" th:value="TBD"/></td>
+            <td><textarea cols="50" id="note" rows="4" th:field="*{note}"></textarea></td>
         </tr>
         <tr>
             <td><label for="password1" th:text="#{label.password}">Password: </label></td>
-            <td><input id="password1" th:value="TBD" type="password"/></td>
+            <td><input id="password1" th:field="*{password1}" type="password"/></td>
         </tr>
         <tr>
             <td><label for="password2" th:text="#{label.confirmPassword}">Confirm password: </label></td>
-            <td><input id="password2" th:value="TBD" type="password"/></td>
+            <td><input id="password2" th:field="*{password2}" type="password"/></td>
+        </tr>
+        <tr>
+            <td colspan="2"><span th:text="#{msg.emptyPasswordHint}">* If you leave the password empty, it won't be modified.</span>
+            </td>
         </tr>
         <tr>
             <td><label for="status" th:text="#{label.status}">Status: </label></td>
-            <td><select id="status">
-                <option th:selected="true" th:text="#{status.active}" th:value="A">Active</option>
-                <option th:text="#{status.deleted}" th:value="D">Deleted</option>
+            <td><select id="status" th:field="*{status}">
+                <option th:selected="${command.status == 'A'}" th:text="#{status.A}" th:value="${'A'}">Active</option>
+                <option th:selected="${command.status == 'D'}" th:text="#{status.D}" th:value="${'D'}">Deleted</option>
             </select></td>
         </tr>
         <tr>
