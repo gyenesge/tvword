@@ -5,41 +5,53 @@
     <title th:text="#{title.createTextCampaign}">Create Text Campaign</title>
 </head>
 <body>
+<!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.web.CampaignCommand"*/-->
+<!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
 <h1 th:text="#{title.createTextCampaign}">Create Text Campaign</h1>
-<form>
+<form th:action="@{/admin/campaigns/createtextprocess}" th:method="post" th:object="${campaign}">
     <table>
         <tr>
             <td><label for="name" th:text="#{label.name}">Name: </label></td>
-            <td><input id="name"/></td>
+            <td><input id="name" th:field="*{name}"/></td>
         </tr>
         <tr>
             <td><label for="startDate" th:text="#{label.startDate}">Start date: </label></td>
-            <td><input id="startDate"/></td>
+            <td><input id="startDate" th:field="*{start}"/></td>
         </tr>
         <tr>
             <td><label for="endDate" th:text="#{label.endDate}">End date: </label></td>
-            <td><input id="endDate"/></td>
+            <td><input id="endDate" th:field="*{expiry}"/></td>
         </tr>
         <tr>
             <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
             <td>
-                <div><input name="displaysEnabled" th:value="1" type="checkbox"/> <label th:text="${'Display 1'}">Display
+                <div th:each="display, stat : ${campaign.displays}"><input name="displaysEnabled"
+                                                                           th:field="*{displayEnablement[__${stat.index}__]}"
+                                                                           th:value="${display.id}" type="checkbox"/>
+                    <label th:text="${display.name}">Display
                     1</label></div>
-                <div><input name="displaysEnabled" th:value="2" type="checkbox"/> <label th:text="${'Display 2'}">Display
-                    2</label></div>
             </td>
         </tr>
         <tr>
             <td><label for="text" th:text="#{label.text}">Text to display: </label></td>
-            <td><textarea id="text"></textarea></td>
+            <td><textarea cols="50" id="text" rows="4" th:field="*{text}"></textarea></td>
         </tr>
         <tr>
             <td><label for="fontColor" th:text="#{label.fontColor}">Font color: </label></td>
-            <td><input id="fontColor"/></td>
+            <td><input id="fontColor" th:field="*{textColor}"/></td>
         </tr>
         <tr>
             <td><label for="bkgColor" th:text="#{label.bkgColor}">Background color: </label></td>
-            <td><input id="bkgColor"/></td>
+            <td><input id="bkgColor" th:field="*{bkgColor}"/></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label th:text="#{label.sample}">Sample:</label></td>
+        </tr>
+        <tr>
+            <td colspan="2" id="sample"
+                th:style="${'text-align:center; background-color:'+campaign.bkgColor+'; color:'+campaign.textColor+';'}"
+                th:text="${campaign.text}">Lorem ipsum ...
+            </td>
         </tr>
         <tr>
             <td><input id="submit" th:value="#{button.create}" type="submit"></td>
@@ -47,5 +59,19 @@
         </tr>
     </table>
 </form>
+<script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>
+<script type="application/javascript">
+    $(document).ready(function () {
+        $('#bkgColor').on('input', function (e) {
+            $('#sample').css('background-color', e.target.value);
+        });
+        $('#fontColor').on('input', function (e) {
+            $('#sample').css('color', e.target.value);
+        });
+        $('#text').on('input', function (e) {
+            $('#sample').text(e.target.value);
+        });
+    });
+</script>
 </body>
 </html>

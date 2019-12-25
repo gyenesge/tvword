@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="errorCode" type="java.lang.Integer"*/-->
+<!--/*@thymesVar id="exception" type="java.lang.Exception"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.error}">Error</title>
+</head>
+<body>
+<h1 th:utext="#{${'error.code.'+errorCode}}">Here comes the error message.</h1>
+<p th:if="${errorCode == 999}" th:text="${exception.getMessage()}">Message of unknown exception.</p>
+<p th:text="#{msg.genericErrorHint}">You have the following options:</p>
+<ul>
+    <li>
+        <span th:text="#{msg.goBackAndFix}">You can start a display: </span><a href="javascript:history.back()"
+                                                                               th:text="#{link.goBack}">Go back</a>
+    </li>
+    <li>
+        <span th:text="#{msg.leaveAndLogout}">Or you can leave and logout: </span>
+        <a href="javascript:window.open('/perform_logout', '_self')" th:text="#{button.logout}">
+            Logout</a>
+    </li>
+</ul>
+</body>
+</html>

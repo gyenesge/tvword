@@ -1,6 +1,7 @@
 package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.*;
+import home.gabe.tvword.model.web.CampaignCommand;
 import home.gabe.tvword.services.CampaignService;
 import home.gabe.tvword.services.DisplayService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 @Slf4j
 @Controller
@@ -39,7 +44,7 @@ public class CampaignController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown campaign ID: " + id);
 
         if (!campaign.getStatus().equals(Status.ACTIVE))
-            throw new IllegalStateException("The selected campaign is not active: " + id);
+            throw new TVWordException("The selected campaign is not active: " + id, TVWordException.EC_CAMPAIGN_NOTACTIVE);
 
         //validate permission and consistence (e.g. a campaign can be displayed only for authenticated device)
         Display activeDisplay = DisplayController.getDisplay(principal);
@@ -89,8 +94,43 @@ public class CampaignController {
     }
 
     @RequestMapping("/admin/campaigns/create/text")
-    public String getTextCampaignCreate() {
+    public String getTextCampaignCreate(Model model) {
+        CampaignCommand campaign = new CampaignCommand();
+        //set default values
+        campaign.setType(TextCampaign.CMP_TYPE);
+        campaign.setStart(LocalDateTime.now());
+        campaign.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.MONTHS));
+        campaign.setBkgColor("#FFF");
+        campaign.setTextColor("#000");
+        campaign.setText("Lorem ipsum, dolor sit amet...");
+
+        Set<Display> displays = displayService.findAll(false);
+
+        campaign.initDisplays(displays, null);
+
+        model.addAttribute("campaign", campaign);
+        model.addAttribute("displays", displays);
         return "/admin/createtextcam";
+    }
+
+    @PostMapping("/admin/campaigns/createtextprocess")
+    public String processCreateTextCampaign(Model model, @ModelAttribute CampaignCommand command) {
+        if (command.getName() == null || command.getName().trim().length() == 0)
+            throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
+        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
+            throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_START);
+        if (command.getExpiry() == null || command.getExpiry().isBefore(command.getStart()))
+            throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_EXPIRY);
+        if (command.getText() == null || command.getText().trim().length() == 0)
+            throw new TVWordException("Text message is mandatory for text campaign.", TVWordException.EC_TEXT_MISSING);
+        if (!TextCampaign.validateColorCode(command.getTextColor()) || !TextCampaign.validateColorCode(command.getBkgColor()))
+            throw new TVWordException("Invalid color code.", TVWordException.EC_INVALID_COLORCODE);
+        if (!command.isDisplaySelected())
+            throw new TVWordException("At least one display must be selected for the campaign.", TVWordException.EC_DISPLAY_NOT_ENABLED);
+
+        command.initDisplays(displayService.findAll(false));
+        campaignService.create(command.toTextCampaign());
+        return "redirect:/admin/campaigns";
     }
 
     @RequestMapping("/admin/campaigns/create/picture")
