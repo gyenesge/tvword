@@ -1,9 +1,6 @@
 package home.gabe.tvword.model.web;
 
-import home.gabe.tvword.model.CampaignType;
-import home.gabe.tvword.model.Display;
-import home.gabe.tvword.model.Status;
-import home.gabe.tvword.model.TextCampaign;
+import home.gabe.tvword.model.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -23,7 +20,7 @@ public class CampaignCommand {
     private Display[] displays;
     private Boolean[] displayEnablement;
 
-    private Status status = Status.ACTIVE;
+    private String status = Status.ACTIVE.getStatusCode();
 
     private String text;
 
@@ -66,17 +63,47 @@ public class CampaignCommand {
         textCampaign.setText(text);
         textCampaign.setTextColor(textColor);
         textCampaign.setBkgColor(bkgColor);
-        textCampaign.setStatus(status);
+        textCampaign.setStatus(Status.parse(status));
         textCampaign.setExpiry(expiry);
         textCampaign.setStart(start);
-        Set<Display> enabled = textCampaign.getDisplays();
+        loadDisplays(textCampaign);
+        return textCampaign;
+    }
+
+    private void loadDisplays(Campaign campaign) {
+        Set<Display> enabled = campaign.getDisplays();
+
+        //clear up first
+        for (Display display : enabled) {
+            display.getCampaigns().remove(campaign);
+        }
+        enabled.clear();
+
+        //then set new assigments
         for (int i = 0; i < displays.length; i++) {
             if (i < displayEnablement.length && displayEnablement[i] != null && displayEnablement[i]) {
                 enabled.add(displays[i]);
-                displays[i].getCampaigns().add(textCampaign);
+                this.displays[i].getCampaigns().add(campaign);
             }
         }
-        return textCampaign;
+    }
+
+    public void populate(Campaign campaign, Set<Display> displays) {
+        id = campaign.getId();
+        name = campaign.getName();
+        status = campaign.getStatus().getStatusCode();
+        expiry = campaign.getExpiry();
+        start = campaign.getStart();
+        type = campaign.getType();
+        initDisplays(displays, campaign.getDisplays());
+        if (campaign instanceof TextCampaign) {
+            text = ((TextCampaign) campaign).getText();
+            textColor = ((TextCampaign) campaign).getTextColor();
+            bkgColor = ((TextCampaign) campaign).getBkgColor();
+        } else if (campaign instanceof PictureCampaign) {
+            //do nothing here. picture is handle specially
+        } else
+            throw new IllegalArgumentException("Invalid campaign type: " + campaign.getClass().getName());
     }
 
     public boolean isDisplaySelected() {
@@ -87,5 +114,13 @@ public class CampaignCommand {
                 return true;
         }
         return false;
+    }
+
+    public void update(Campaign campaign) {
+        campaign.setName(name);
+        campaign.setStart(start);
+        campaign.setExpiry(expiry);
+        campaign.setStatus(Status.parse(status));
+        loadDisplays(campaign);
     }
 }

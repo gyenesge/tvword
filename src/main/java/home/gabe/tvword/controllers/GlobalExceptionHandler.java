@@ -14,7 +14,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ModelAndView handleException(HttpServletRequest request, Exception ex) {
 
-        log.error("Exception received.", ex);
+        if (ex instanceof TVWordException) {
+            log.error("Business error in {} with code {} and message: {}", request.getRequestURL(), ((TVWordException) ex).getErrorCode(), ex.getMessage());
+        } else {
+            log.error("Exception received.", ex);
+        }
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/error/general");

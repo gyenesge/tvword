@@ -4,6 +4,7 @@ import home.gabe.tvword.controllers.CampaignSelector;
 import home.gabe.tvword.model.Campaign;
 import home.gabe.tvword.model.Display;
 import home.gabe.tvword.model.User;
+import home.gabe.tvword.model.web.CampaignCommand;
 import home.gabe.tvword.repositories.CampaignRepository;
 import home.gabe.tvword.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -67,5 +68,17 @@ public class CampaignServiceImpl implements CampaignService {
     public Campaign findById(Long id) {
         Optional<Campaign> optional = campaignRepository.findById(id);
         return optional.isEmpty() ? null : optional.get();
+    }
+
+    @Override
+    public Campaign update(CampaignCommand campaignCommand) {
+        Optional<Campaign> oCampaign = campaignRepository.findById(campaignCommand.getId());
+        if (oCampaign.isEmpty())
+            throw new IllegalArgumentException("Invalid campaign id: " + campaignCommand.getId());
+        Campaign campaign = oCampaign.get();
+
+        campaignCommand.update(campaign);
+
+        return campaignRepository.save(campaign);
     }
 }

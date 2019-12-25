@@ -1,47 +1,49 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'campaigns')}" xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.Campaign"*/-->
-<!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
+<!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.web.CampaignCommand"*/-->
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title.modifyCampaign}">Modify Campaign</title>
 </head>
 <body>
 <h1 th:text="#{title.modifyCampaign}">Modify Campaign</h1>
-<form>
+<form method="post" th:action="@{/admin/campaigns/modifyprocess}" th:object="${campaign}">
     <table>
         <tr>
             <td><label th:text="#{label.id}">ID: </label></td>
-            <td><span th:text="${campaign.id}">1</span></td>
+            <td><span th:text="${campaign.id}">1</span><input id="id" th:field="*{id}" type="hidden"/></td>
+        </tr>
+        <tr>
+            <td><label th:text="#{label.type}">Type: </label></td>
+            <td><span th:text="#{${'type.'+campaign.type.type}}">picture</span></td>
         </tr>
         <tr>
             <td><label for="name" th:text="#{label.name}">Name: </label></td>
-            <td><input id="name" th:value="${campaign.name}"/></td>
+            <td><input id="name" th:field="*{name}"/></td>
         </tr>
         <tr>
             <td><label for="startDate" th:text="#{label.startDate}">Start date: </label></td>
-            <td><input id="startDate" th:value="${{campaign.start}}"/></td>
+            <td><input id="startDate" th:field="*{start}"/></td>
         </tr>
         <tr>
             <td><label for="endDate" th:text="#{label.endDate}">End date: </label></td>
-            <td><input id="endDate" th:value="${{campaign.expiry}}"/></td>
+            <td><input id="endDate" th:field="*{expiry}"/></td>
         </tr>
         <tr>
             <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
             <td>
-                <div th:each="display : ${displays}"><input name="displaysEnabled"
-                                                            th:checked="${campaign.displays.contains(display)}"
-                                                            th:value="${display.id}" type="checkbox"/> <label
-                        th:text="${display.name}">Display 1</label></div>
+                <div th:each="display, stat : ${campaign.displays}">
+                    <input name="displaysEnabled" th:checked="${campaign.displayEnablement[__${stat.index}__]}"
+                           th:field="*{displayEnablement[__${stat.index}__]}" type="checkbox"/>
+                    <label th:text="${display.name}">Display 1</label>
+                </div>
             </td>
         </tr>
         <tr>
             <td><label for="status" th:text="#{label.status}">Status: </label></td>
-            <td><select id="status">
-                <option th:selected="${campaign.getStatus().isActive()}" th:text="#{status.A}" th:value="A">Active
-                </option>
-                <option th:selected="${campaign.getStatus().isDeleted()}" th:text="#{status.D}" th:value="D">Deleted
-                </option>
+            <td><select id="status" th:field="*{status}">
+                <option th:selected="${campaign.status == 'A'}" th:text="#{status.A}" th:value="A">Active</option>
+                <option th:selected="${campaign.status == 'D'}" th:text="#{status.D}" th:value="D">Deleted</option>
             </select></td>
         </tr>
         <tr>

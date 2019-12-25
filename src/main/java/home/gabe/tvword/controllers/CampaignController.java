@@ -140,8 +140,34 @@ public class CampaignController {
 
     @RequestMapping("/admin/campaigns/{id}/modify")
     public String getModifyCampaign(Model model, @PathVariable Long id) {
-        model.addAttribute("campaign", campaignService.findById(id));
-        model.addAttribute("displays", displayService.findAll(false));
+
+        Set<Display> displays = displayService.findAll(false);
+
+        CampaignCommand command = new CampaignCommand();
+        command.populate(campaignService.findById(id), displays);
+
+        model.addAttribute("campaign", command);
+        model.addAttribute("displays", displays);
+
         return "/admin/modifycam";
+    }
+
+    @PostMapping("/admin/campaigns/modifyprocess")
+    public String processModifyCampaign(@ModelAttribute CampaignCommand command) {
+        if (command.getName() == null || command.getName().trim().length() == 0)
+            throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
+        if (command.getStart() == null)
+            throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_START);
+        if (command.getExpiry() == null || command.getExpiry().isBefore(command.getStart()))
+            throw new TVWordException("Invalid expiry date.", TVWordException.EC_INVALID_EXPIRY);
+        if (!command.isDisplaySelected())
+            throw new TVWordException("At least one display must be selected for the campaign.", TVWordException.EC_DISPLAY_NOT_ENABLED);
+        if (Status.parse(command.getStatus()) == null)
+            throw new TVWordException("Invalid status code: " + command.getStatus(), TVWordException.EC_GENERAL_ERROR);
+
+        command.initDisplays(displayService.findAll(false));
+        campaignService.update(command);
+
+        return "redirect:/admin/campaigns";
     }
 }

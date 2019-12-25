@@ -6,7 +6,6 @@
 </head>
 <body>
 <!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.web.CampaignCommand"*/-->
-<!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
 <h1 th:text="#{title.createTextCampaign}">Create Text Campaign</h1>
 <form th:action="@{/admin/campaigns/createtextprocess}" th:method="post" th:object="${campaign}">
     <table>
