@@ -112,7 +112,7 @@ public class CampaignCommand {
             textColor = ((TextCampaign) campaign).getTextColor();
             bkgColor = ((TextCampaign) campaign).getBkgColor();
         } else if (campaign instanceof PictureCampaign) {
-            //do nothing here. picture is handle specially
+            image = ((PictureCampaign) campaign).getImage();
         } else
             throw new IllegalArgumentException("Invalid campaign type: " + campaign.getClass().getName());
     }

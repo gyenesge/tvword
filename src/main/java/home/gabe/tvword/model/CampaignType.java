@@ -35,6 +35,20 @@ public class CampaignType {
     }
 
 
+    /**
+     * Helper methods for Thymeleaf templates.
+     */
+    public boolean isPictureCampaign() {
+        return equals(PictureCampaign.CMP_TYPE);
+    }
+
+    /**
+     * Helper methods for Thymeleaf templates.
+     */
+    public boolean isTextCampaign() {
+        return equals(TextCampaign.CMP_TYPE);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -63,12 +63,12 @@ public class CampaignController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested campaign method is not supported: " + campaign.getClass().getName());
     }
 
-    @GetMapping("/campaigns/{id}/image")
+    @GetMapping(value = {"/campaigns/{id}/image", "/admin/campaigns/{id}/image"})
     public void showCampaignImage(@PathVariable String id, HttpServletResponse response) throws IOException {
 
         Campaign campaign = campaignService.findById(Long.parseLong(id));
         if (campaign == null || !(campaign instanceof PictureCampaign))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The request campaign does not exist or it is not a picture campaign. ID: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested campaign does not exist or it is not a picture campaign. ID: " + id);
 
         Image image = ((PictureCampaign) campaign).getImage();
         response.setContentType(image.getFormat());
@@ -77,7 +77,7 @@ public class CampaignController {
     }
 
 
-    @RequestMapping("/admin/campaigns")
+    @GetMapping("/admin/campaigns")
     public String getCampaignIndex(Model model, @RequestParam(required = false) String displayId) {
         Iterable<Campaign> campaigns = null;
         Long id = null;
@@ -92,6 +92,15 @@ public class CampaignController {
         model.addAttribute("displays", displayService.findAll(false));
         model.addAttribute("filterDisplay", id);
         return "/admin/campaigns";
+    }
+
+    @GetMapping("/admin/campaigns/{id}")
+    public String getCampaignForPreview(Model model, @PathVariable Long id) {
+        Campaign campaign = campaignService.findById(id);
+
+        model.addAttribute("campaign", campaign);
+        model.addAttribute(campaign instanceof TextCampaign ? "textCampaign" : "pictureCampaign", campaign);
+        return "/admin/viewcampaign";
     }
 
     @RequestMapping("/admin/campaigns/create/text")

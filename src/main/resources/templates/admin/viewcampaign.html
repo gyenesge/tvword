@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'campaigns')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.viewCampaign}">View Campaign</title>
+</head>
+<body>
+<!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.Campaign"*/-->
+<!--/*@thymesVar id="textCampaign" type="home.gabe.tvword.model.TextCampaign"*/-->
+<!--/*@thymesVar id="pictureCampaign" type="home.gabe.tvword.model.PictureCampaign"*/-->
+<h1 th:text="#{title.viewCampaign}">View Campaign</h1>
+<table>
+    <tr>
+        <td><label th:text="#{label.id}">ID: </label></td>
+        <td><span th:text="${campaign.id}">1</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.name}">Name: </label></td>
+        <td><span th:field="${campaign.name}">Campaign name</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.type}">Type: </label></td>
+        <td><span th:text="#{${'type.'+campaign.type.type}}">picture</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.startDate}">Start date: </label></td>
+        <td><span th:text="${{campaign.start}}">2019-12-12</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.endDate}">End date: </label></td>
+        <td><span th:text="${{campaign.expiry}}">2020-12-12</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.status}">Status: </label></td>
+        <td><span th:text="#{'status.'+${campaign.status.statusCode}}">Active</span></td>
+    </tr>
+    <tr>
+        <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
+        <td>
+            <div th:each="display : ${campaign.displays}" th:text="${display.name}">Display 1</div>
+        </td>
+    </tr>
+    <tr>
+        <td/>
+        <td style="padding-bottom: 20px;"><a th:href="${'/admin/campaigns/'+campaign.id+'/modify'}"
+                                             th:text="#{link.modify}">Modify</a></td>
+    </tr>
+    <tr th:if="${campaign.getType().isTextCampaign()}">
+        <td><label th:text="#{label.text}">Text to display: </label></td>
+        <td><span th:text="${textCampaign.text}">2020-12-12</span></td>
+    </tr>
+    <tr th:if="${campaign.getType().isTextCampaign()}">
+        <td><label th:text="#{label.fontColor}">Text color: </label></td>
+        <td><span th:text="${textCampaign.textColor}">Active</span></td>
+    </tr>
+    <tr th:if="${campaign.getType().isTextCampaign()}">
+        <td><label th:text="#{label.bkgColor}">Background: </label></td>
+        <td><span th:text="${textCampaign.bkgColor}">Active</span></td>
+    </tr>
+    <tr th:if="${campaign.getType().isPictureCampaign()}">
+        <td><label th:text="#{label.fileName}">File name: </label></td>
+        <td><span th:text="${pictureCampaign.image.fileName}">Active</span></td>
+    </tr>
+</table>
+
+<p>
+<div th:text="#{label.sample}">Sample:</div>
+<div id="imageHolder" th:if="${campaign.getType().isPictureCampaign()}"
+     th:style="${'width:640px; height:480px; padding: 2px; background-color:black;'}">
+    <img id="image" style="position: relative" th:src="${'/admin/campaigns/'+campaign.id+'/image'}"/>
+</div>
+<div th:if="${campaign.getType().isTextCampaign()}"
+     th:style="${'width:512px; height:436px; background-color:'+textCampaign.bkgColor+';  padding-left: 64px; padding-right: 64px; padding-bottom: 0px; padding-top:48px'}">
+    <div id="container"
+         th:style="${'width:100%; height:100%; text-align:center; background-color:'+textCampaign.bkgColor+'; color:'+textCampaign.textColor+';'}">
+        <span id="mainText" th:text="${textCampaign.text}">Lorem ipsum ...</span>
+    </div>
+</div>
+
+</p>
+
+<script th:if="${campaign.getType().isTextCampaign()}" th:src="@{/js/jquery.textfill.min.js}"></script>
+<script th:if="${campaign.getType().isTextCampaign()}" type="application/javascript">
+
+    function setTextSize() {
+        $('#container').css('height', 480 - 96);
+
+        $('#container').textfill({
+            maxFontPixels: 200,
+            allowOverflow: true
+        });
+    }
+
+    setTextSize();
+</script>
+
+<script th:if="${campaign.getType().isPictureCampaign()}" type="application/javascript">
+
+    function setImageSize() {
+        var wh = 480;
+        var ww = 640;
+        var ih = $('#image').height();
+        var iw = $('#image').width();
+        var newh = ih;
+        var neww = iw;
+        var topp = 0;
+        var leftp = 0;
+
+
+        if (wh / ww < ih / iw) {
+            // the frame is lower
+            newh = wh;
+            neww = newh / ih * iw;
+            leftp = (ww - neww) / 2;
+        } else {
+            // frame is heigher
+            neww = ww;
+            newh = neww / iw * ih;
+            topp = (wh - newh) / 2;
+        }
+
+        $('#image').css('height', newh);
+        $('#image').css('width', neww);
+        $('#image').css('top', topp);
+        $('#image').css('left', leftp);
+    }
+
+    setImageSize();
+</script>
+</body>
+</html>

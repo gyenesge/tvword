@@ -37,7 +37,8 @@
             <div th:each="display : ${campaign.displays}" th:text="${display.name}">Display 1</div>
         </td>
         <td th:text="#{${'status.'+campaign.status.getStatusCode()}}">Active</td>
-        <td><a th:href="${'/admin/campaigns/'+campaign.id+'/modify'}" th:text="#{link.modify}">Modify</a></td>
+        <td><a th:href="${'/admin/campaigns/'+campaign.id}" th:text="#{link.view}">View</a> | <a
+                th:href="${'/admin/campaigns/'+campaign.id+'/modify'}" th:text="#{link.modify}">Modify</a></td>
     </tr>
 </table>
 <p th:if="${campaigns.isEmpty()}" th:text="#{msg.noCampaignToList}">There is no campaign available to show. You may
