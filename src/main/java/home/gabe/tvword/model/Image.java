@@ -21,4 +21,8 @@ public class Image {
 
     @Lob
     private byte[] content;
+
+    public static boolean isSupportedFormat(String format) {
+        return FORMAT_GIF.equals(format) || FORMAT_JPG.equals(format) || FORMAT_PNG.equals(format);
+    }
 }

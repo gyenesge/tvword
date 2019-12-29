@@ -4,34 +4,37 @@
     <meta charset="UTF-8">
     <title th:text="#{title.createPictureCampaign}">Create Picture Campaign</title>
 </head>
+<!--/*@thymesVar id="campaign" type="home.gabe.tvword.model.web.CampaignCommand"*/-->
 <body>
 <h1 th:text="#{title.createPictureCampaign}">Create Picture Campaign</h1>
-<form>
+<form enctype="multipart/form-data" th:action="@{/admin/campaigns/createpicprocess}" th:method="post"
+      th:object="${campaign}">
     <table>
         <tr>
             <td><label for="name" th:text="#{label.name}">Name: </label></td>
-            <td><input id="name"/></td>
+            <td><input id="name" th:field="*{name}"/></td>
         </tr>
         <tr>
             <td><label for="startDate" th:text="#{label.startDate}">Start date: </label></td>
-            <td><input id="startDate"/></td>
+            <td><input id="startDate" th:field="*{start}"/></td>
         </tr>
         <tr>
             <td><label for="endDate" th:text="#{label.endDate}">End date: </label></td>
-            <td><input id="endDate"/></td>
+            <td><input id="endDate" th:field="*{expiry}"/></td>
         </tr>
         <tr>
             <td><label th:text="#{label.displaysEnabled}">Enable on displays: </label></td>
             <td>
-                <div><input name="displaysEnabled" th:value="1" type="checkbox"/> <label th:text="${'Display 1'}">Display
-                    1</label></div>
-                <div><input name="displaysEnabled" th:value="2" type="checkbox"/> <label th:text="${'Display 2'}">Display
-                    2</label></div>
+                <div th:each="display, stat : ${campaign.displays}">
+                    <input name="displaysEnabled" th:field="*{displayEnablement[__${stat.index}__]}"
+                           th:value="${display.id}" type="checkbox"/>
+                    <label th:text="${display.name}">Display 1</label>
+                </div>
             </td>
         </tr>
         <tr>
             <td><label for="picture" th:text="#{label.uploadPicture}">Upload picture: </label></td>
-            <td><input id="picture" type="file"></td>
+            <td><input accept="image/png,image/jpeg,image/jpg,image/gif" id="picture" name="picture" type="file"></td>
         </tr>
         <tr>
             <td><input id="submit" th:value="#{button.create}" type="submit"></td>

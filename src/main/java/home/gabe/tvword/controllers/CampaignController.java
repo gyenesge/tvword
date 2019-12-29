@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -134,10 +135,50 @@ public class CampaignController {
     }
 
     @RequestMapping("/admin/campaigns/create/picture")
-    public String getPictureCampaignCreate() {
+    public String getPictureCampaignCreate(Model model) {
+        CampaignCommand campaign = new CampaignCommand();
+        //set default values
+        campaign.setType(PictureCampaign.CMP_TYPE);
+        campaign.setStart(LocalDateTime.now());
+        campaign.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.MONTHS));
+
+        Set<Display> displays = displayService.findAll(false);
+
+        campaign.initDisplays(displays, null);
+
+        model.addAttribute("campaign", campaign);
+        model.addAttribute("displays", displays);
         return "/admin/createpicturecam";
     }
 
+    @PostMapping("/admin/campaigns/createpicprocess")
+    public String processCreatePictureCampaign(Model model, @ModelAttribute CampaignCommand command, @RequestParam("picture") MultipartFile file) {
+        if (command.getName() == null || command.getName().trim().length() == 0)
+            throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
+        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
+            throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_START);
+        if (command.getExpiry() == null || command.getExpiry().isBefore(command.getStart()))
+            throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_EXPIRY);
+        if (!command.isDisplaySelected())
+            throw new TVWordException("At least one display must be selected for the campaign.", TVWordException.EC_DISPLAY_NOT_ENABLED);
+        if (!Image.isSupportedFormat(file.getContentType()))
+            throw new TVWordException("Unsupported file content.", TVWordException.EC_UNSUPPORTED_FILE);
+
+        Image image = new Image();
+        image.setFormat(file.getContentType());
+        image.setFileName(file.getName());
+        try {
+            image.setContent(file.getBytes());
+        } catch (IOException e) {
+            throw new TVWordException("Failed to read bytes of the file.", e, TVWordException.EC_UNSUPPORTED_FILE);
+        }
+        command.initDisplays(displayService.findAll(false));
+        command.setImage(image);
+
+        campaignService.create(command.toPictureCampaign());
+
+        return "redirect:/admin/campaigns";
+    }
     @RequestMapping("/admin/campaigns/{id}/modify")
     public String getModifyCampaign(Model model, @PathVariable Long id) {
 

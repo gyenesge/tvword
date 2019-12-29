@@ -28,6 +28,8 @@ public class CampaignCommand {
 
     private String textColor;
 
+    private Image image;
+
     public void initDisplays(Set<Display> all, Set<Display> enabled) {
         if (all == null || (enabled != null && all.size() < enabled.size())) {
             throw new IllegalArgumentException("Incosistent data for setting display enablement.");
@@ -58,16 +60,25 @@ public class CampaignCommand {
 
     public TextCampaign toTextCampaign() {
         TextCampaign textCampaign = new TextCampaign();
-        textCampaign.setId(id);
-        textCampaign.setName(name);
+
+        update(textCampaign);
+
         textCampaign.setText(text);
         textCampaign.setTextColor(textColor);
         textCampaign.setBkgColor(bkgColor);
-        textCampaign.setStatus(Status.parse(status));
-        textCampaign.setExpiry(expiry);
-        textCampaign.setStart(start);
-        loadDisplays(textCampaign);
+
         return textCampaign;
+    }
+
+    public Campaign toPictureCampaign() {
+        PictureCampaign pictureCampaign = new PictureCampaign();
+
+        update(pictureCampaign);
+
+        pictureCampaign.setImage(image);
+
+        return pictureCampaign;
+
     }
 
     private void loadDisplays(Campaign campaign) {
@@ -117,10 +128,12 @@ public class CampaignCommand {
     }
 
     public void update(Campaign campaign) {
+        campaign.setId(id);
         campaign.setName(name);
         campaign.setStart(start);
         campaign.setExpiry(expiry);
         campaign.setStatus(Status.parse(status));
         loadDisplays(campaign);
     }
+
 }
