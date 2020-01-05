@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="pwdCommand" type="home.gabe.tvword.model.web.PasswordCommand"*/-->
+<!--/*@thymesVar id="success" type="java.lang.Boolean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.changePassword}">Change Password</title>
+</head>
+<body>
+<h1 th:text="#{title.changePassword}">Change Password</h1>
+<div th:if="${success}" th:text="#{msg.successfulPasswordChange}">Your password has been change successfully.</div>
+
+<form method="post" th:action="@{/admin/changepwd_process}" th:object="${pwdCommand}">
+    <table>
+        <tr>
+            <td><label for="oldPassword" th:text="#{label.oldPassword}">Name: </label></td>
+            <td><input id="oldPassword" th:field="*{oldPassword}" type="password"/></td>
+        </tr>
+        <tr>
+            <td><label for="newPassword" th:text="#{label.newPassword}">Name: </label></td>
+            <td><input id="newPassword" th:field="*{newPassword}" type="password"/></td>
+        </tr>
+        <tr>
+            <td><label for="confirmPassword" th:text="#{label.confirmPassword}">Name: </label></td>
+            <td><input id="confirmPassword" th:field="*{confirmPassword}" type="password"/></td>
+        </tr>
+        <td><input id="submit" th:value="#{button.create}" type="submit"></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

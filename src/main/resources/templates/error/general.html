@@ -15,12 +15,11 @@
         <span th:text="#{msg.goBackAndFix}">You can start a display: </span><a href="javascript:history.back()"
                                                                                th:text="#{link.goBack}">Go back</a>
     </li>
-    <li>
-        <span th:text="#{msg.leaveAndLogout}">Or you can leave and logout: </span>
-        <form th:action="@{/perform_logout}" th:method="post">
-            <input th:value="#{button.logout}" type="submit">
-        </form>
-    </li>
 </ul>
+<hr/>
+<form th:action="@{/perform_logout}" th:method="post">
+    <input th:value="#{button.logout}" type="submit">
+</form>
+
 </body>
 </html>

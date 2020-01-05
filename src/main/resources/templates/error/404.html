@@ -12,6 +12,8 @@
 <p><span th:text="#{msg.startAdmin}">Or you can start administering stuff: </span><a href="/admin/displays"
                                                                                      th:text="#{link.startAdmin}">admin
     index page</a></p>
+
+<hr/>
 <p>
 <form th:action="@{/perform_logout}" th:method="post">
     <input th:value="#{button.logout}" type="submit">

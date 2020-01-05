@@ -25,7 +25,7 @@ public class DisplayServiceImpl implements DisplayService {
     public DisplayServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        log.info("Display service is initialized with repository {}.", userRepository.getClass().getName());
+        log.debug("Display service is initialized with repository {}.", userRepository.getClass().getName());
     }
 
     @Override

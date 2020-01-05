@@ -10,6 +10,9 @@ public class TVWordException extends RuntimeException {
     public static final int EC_NAME_MISSING = 106;
     public static final int EC_DISPLAY_NOT_ENABLED = 107;
     public static final int EC_UNSUPPORTED_FILE = 108;
+    public static final int EC_PASSWORD_MISSING = 109;
+    public static final int EC_PASSWORD_MISMATCH = 110;
+    public static final int EC_INVALID_PASSWORD = 111;
     private int errorCode;
 
     public TVWordException(int errorCode) {
