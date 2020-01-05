@@ -17,8 +17,9 @@
     </li>
     <li>
         <span th:text="#{msg.leaveAndLogout}">Or you can leave and logout: </span>
-        <a href="javascript:window.open('/perform_logout', '_self')" th:text="#{button.logout}">
-            Logout</a>
+        <form th:action="@{/perform_logout}" th:method="post">
+            <input th:value="#{button.logout}" type="submit">
+        </form>
     </li>
 </ul>
 </body>

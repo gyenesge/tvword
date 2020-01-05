@@ -18,16 +18,17 @@
 <div>
     | <a href="/admin/displays" th:text="#{menu.manageDisplays}">Manage Displays</a> |
     <a href="/admin/campaigns" th:text="#{menu.manageCampaigns}">Manage Campaigns</a> |
-    <a href="/perform_logout" th:text="#{menu.logout}">Logout</a> |
 </div>
 
 <div class="container-fluid">
     <div class="container xd-container">
-
+        <hr/>
         <th:block th:include="${template}"/>
-
         <br/>
-        <br/>
+        <hr/>
+        <form th:action="@{/perform_logout}" th:method="post">
+            <input th:value="#{button.logout}" type="submit">
+        </form>
         <div class="container">
             <div class="row">
                 <div class="col-12 text-center">...</div>

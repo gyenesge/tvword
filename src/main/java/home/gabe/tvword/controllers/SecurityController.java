@@ -41,25 +41,25 @@ public class SecurityController extends WebSecurityConfigurerAdapter {
                 .antMatchers("/displays").hasRole("DISPLAY")
                 .antMatchers("/displays/**").hasRole("DISPLAY")
                 .antMatchers("/campaigns/**").hasRole("DISPLAY")
-                .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/login/display**").permitAll()
+                //.antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/login**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login/display")
+                .loginPage("/login")
                 .loginProcessingUrl("/perform_login")
                 .defaultSuccessUrl("/start")
-                .failureUrl("/login/display?error=true")
+                .failureUrl("/login?error=true")
                 .and()
                 .logout()
                 .logoutUrl("/perform_logout")
                 .deleteCookies("JSESSIONID")
-                .logoutSuccessUrl("/login/display")
+                .logoutSuccessUrl("/login")
                 .and()
                 .rememberMe().key("6ax-;SYLE*m5Wv::xUvDnD%")
         ;
 
-        http.headers().frameOptions().disable();
-        http.csrf().disable();
+        //http.headers().frameOptions().disable();
+        //http.csrf().disable();
     }
 }

@@ -12,4 +12,4 @@ document.onkeypress = onCKeyPress;
 //set timeout to refresh the page regularly
 setTimeout(function () {
     window.open('/displays/next', '_self');
-}, 60 * 1000);
+}, 20 * 1000);

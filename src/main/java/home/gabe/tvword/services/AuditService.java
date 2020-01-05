@@ -17,7 +17,7 @@ public class AuditService implements ApplicationListener<AbstractAuthenticationE
         if (this.logInteractiveAuthenticationSuccessEvents || !(event instanceof InteractiveAuthenticationSuccessEvent)) {
             if (log.isWarnEnabled()) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("AUDIT *** ");
+                builder.append("AUDIT: ");
                 builder.append(ClassUtils.getShortName(event.getClass()));
                 builder.append(": ");
                 builder.append(event.getAuthentication().getName());

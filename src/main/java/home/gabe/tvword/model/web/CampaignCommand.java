@@ -136,4 +136,13 @@ public class CampaignCommand {
         loadDisplays(campaign);
     }
 
+    @Override
+    public String toString() {
+        return "CampaignCommand{" +
+                "id=" + id +
+                ", type='" + (type != null ? type.getType() : "null") + '\'' +
+                ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

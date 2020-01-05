@@ -14,9 +14,9 @@
                                                                                      th:text="#{link.startAdmin}">admin
     index page</a></p>
 <p>
-    <button onclick="javascript:window.open('/perform_logout', '_self')" th:text="#{button.logout}" type="button">
-        Logout
-    </button>
+<form th:action="@{/perform_logout}" th:method="post">
+    <input th:value="#{button.logout}" type="submit">
+</form>
 </p>
 </body>
 </html>

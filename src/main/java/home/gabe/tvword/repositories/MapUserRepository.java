@@ -49,6 +49,13 @@ public class MapUserRepository implements UserRepository {
     }
 
     @Override
+    public Long countByRole(UserRole role) {
+        if (users.size() <= 0)
+            return 0L;
+        return users.values().stream().filter(user -> user.getRole().equals(role)).count();
+    }
+
+    @Override
     public Set<User> findAll() {
         return new HashSet<>(users.values());
     }

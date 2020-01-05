@@ -3,6 +3,7 @@ package home.gabe.tvword.bootstrap;
 import home.gabe.tvword.model.*;
 import home.gabe.tvword.repositories.CampaignRepository;
 import home.gabe.tvword.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Component
 public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -59,6 +61,12 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 
     @Transactional
     public void initData() {
+        //check for existing demo data, if data exists, no need for initialization.
+        if (userRepository.countByRole(UserRole.ADMIN) > 0) {
+            log.info("Admin users are already initialized. No need for demo data creation.");
+            return;
+        }
+
         Display textDisplay = new Display();
         textDisplay.setName("text");
         textDisplay.setNote("Test display with text campaigns including expired ones");

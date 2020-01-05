@@ -5,11 +5,8 @@ import home.gabe.tvword.model.Display;
 import home.gabe.tvword.model.web.CreateDisplayCommand;
 import home.gabe.tvword.model.web.ModifyDisplayCommand;
 import home.gabe.tvword.services.CampaignService;
-import home.gabe.tvword.services.DisplayPrincipal;
 import home.gabe.tvword.services.DisplayService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,21 +34,6 @@ public class DisplayController {
         this.campaignSelector = campaignSelector;
     }
 
-    static Display getDisplay(Principal principal) {
-        DisplayPrincipal displayPrincipal = null;
-        if (principal instanceof UsernamePasswordAuthenticationToken) {
-            Object o = ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
-            if (!(o instanceof DisplayPrincipal)) {
-                log.warn("Invalid principal object for this method call {}.", o.getClass().getName());
-                throw new AccessDeniedException("Only Display users can use this service: " + o.getClass().getName());
-            }
-            displayPrincipal = (DisplayPrincipal) o;
-        } else {
-            log.warn("Unknown principal class in session {}.", principal.getClass().getName());
-            throw new AccessDeniedException("Unknown principal class in session: " + principal.getClass().getName());
-        }
-        return displayPrincipal.getDisplay();
-    }
 
     @GetMapping("/displays/start")
     public String startDisplay(Model model,
@@ -59,7 +41,10 @@ public class DisplayController {
                                HttpServletRequest request,
                                HttpServletResponse response,
                                Principal principal) {
-        Display display = getDisplay(principal);
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:startDisplay()", wrapper);
+
+        Display display = wrapper.getDisplay();
 
         model.addAttribute("autostart", autostart);
         model.addAttribute("display", display);
@@ -71,7 +56,7 @@ public class DisplayController {
             return "redirect:/displays/next";
         }
 
-        return "/displays/displayconfig";
+        return "displays/displayconfig";
     }
 
     private Cookie createBooleanCookie(String name, boolean value) {
@@ -86,7 +71,10 @@ public class DisplayController {
     @GetMapping("/displays/next")
     public String getNextCampaign(Principal principal,
                                   HttpServletRequest request) {
-        Display display = getDisplay(principal);
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:getNextCampaign()", wrapper);
+
+        Display display = wrapper.getDisplay();
 
         Set<Campaign> campaigns = campaignService.findByDisplay(display);
 
@@ -94,7 +82,7 @@ public class DisplayController {
 
         if (campaign == null) {
             log.info("There is no valid campaign for display {}.", display);
-            return "/displays/no_campaign";
+            return "displays/no_campaign";
         }
 
         return "redirect:/campaigns/" + campaign.getId();
@@ -105,32 +93,42 @@ public class DisplayController {
                                 Model model,
                                 @CookieValue(value = "autostart", defaultValue = "false", required = false) boolean autostart) {
 
-        Display display = getDisplay(principal);
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:getConfigPage()", wrapper);
+
+        Display display = wrapper.getDisplay();
 
         model.addAttribute("autostart", autostart);
         model.addAttribute("display", display);
 
-        return "/displays/displayconfig";
+        return "displays/displayconfig";
     }
 
 
-    @RequestMapping("/admin/displays")
-    public String getDisplayIndex(Model model, @RequestParam(required = false, defaultValue = "false") Boolean showDeleted) {
+    @GetMapping("/admin/displays")
+    public String getDisplayIndex(Model model, @RequestParam(required = false, defaultValue = "false") Boolean showDeleted, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:getDisplayIndex({})", wrapper, showDeleted);
+
         Set<Display> displays = displayService.findAll(showDeleted);
         model.addAttribute("displays", displays);
         model.addAttribute("checked", showDeleted);
-        return "/admin/displays";
+        return "admin/displays";
     }
 
-    @RequestMapping("/admin/displays/create")
-    public String getCreateDisplay(Model model) {
+    @GetMapping("/admin/displays/create")
+    public String getCreateDisplay(Model model, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:getCreateDisplay()", wrapper);
 
         model.addAttribute("createDisplayCommand", new CreateDisplayCommand());
-        return "/admin/createdisplay";
+        return "admin/createdisplay";
     }
 
     @PostMapping("/admin/displays/createprocess")
-    public String getCreateDisplayProcess(@ModelAttribute CreateDisplayCommand command) {
+    public String processCreateDisplay(@ModelAttribute CreateDisplayCommand command, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:processCreateDisplay({})", wrapper, command);
 
         if (!command.getPassword1().equals(command.getPassword2()))
             throw new IllegalArgumentException("Password missmatch.");
@@ -138,8 +136,11 @@ public class DisplayController {
         return "redirect:/admin/displays";
     }
 
-    @RequestMapping("/admin/displays/{id}/modify")
-    public String getModifyDisplay(Model model, @PathVariable Long id) {
+    @GetMapping("/admin/displays/{id}/modify")
+    public String getModifyDisplay(Model model, @PathVariable Long id, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:getModifyDisplay({})", wrapper, id);
+
         Display display = displayService.findById(id);
 
         ModifyDisplayCommand command = new ModifyDisplayCommand(id);
@@ -148,11 +149,14 @@ public class DisplayController {
 
         model.addAttribute("display", display);
         model.addAttribute("command", command);
-        return "/admin/modifydisplay";
+        return "admin/modifydisplay";
     }
 
     @PostMapping("/admin/displays/modifyprocess")
-    public String processModify(@ModelAttribute ModifyDisplayCommand command) {
+    public String processModifyDisplay(@ModelAttribute ModifyDisplayCommand command, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: DC:processModify({})", wrapper, command);
+
         if (command.getId() == null)
             throw new IllegalArgumentException("Invalid command object. Id is not defined.");
         if (!command.getPassword1().equals(command.getPassword2()))

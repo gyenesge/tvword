@@ -9,7 +9,7 @@
 <h1 th:text="#{title.login}">Display Login</h1>
 <div th:if="${error}" th:text="#{error.invalidLogin}">Invalid login ID or password.</div>
 
-<form action="/perform_login" method='POST' name='f'>
+<form name="f" th:action="@{/perform_login}" th:method="post">
     <table>
         <tr>
             <td th:text="#{label.user}">User:</td>

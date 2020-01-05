@@ -15,16 +15,15 @@
 </p>
 <p>
     <button onclick="javascript:startDisplay()" th:text="#{button.startDisplay}" type="button">Start display</button>
-    <button onclick="javascript:logout()" th:text="#{button.logout}" type="button">Logout</button>
+
+<form th:action="@{/perform_logout}" th:method="post">
+    <input th:value="#{button.logout}" type="submit">
+</form>
+
 </p>
 
 <script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>
 <script type="application/javascript">
-    function logout() {
-        // start display sequence
-        var url = '/perform_logout';
-        window.open(url, '_self');
-    }
 
     function startDisplay() {
         //save cookie state

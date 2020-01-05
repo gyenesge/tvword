@@ -34,12 +34,13 @@ public class CampaignController {
         this.displayService = displayService;
     }
 
-    @RequestMapping("/campaigns/{id}")
+    @GetMapping("/campaigns/{id}")
     public String getCampaign(@PathVariable Long id,
                               @CookieValue(value = "fullScreen", defaultValue = "false", required = false) boolean fullScreen,
                               Principal principal,
                               Model model) {
-
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getCampaign({})", wrapper, id);
         Campaign campaign = campaignService.findById(id);
         if (campaign == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown campaign ID: " + id);
@@ -48,7 +49,7 @@ public class CampaignController {
             throw new TVWordException("The selected campaign is not active: " + id, TVWordException.EC_CAMPAIGN_NOTACTIVE);
 
         //validate permission and consistence (e.g. a campaign can be displayed only for authenticated device)
-        Display activeDisplay = DisplayController.getDisplay(principal);
+        Display activeDisplay = wrapper.getDisplay();
         if (!campaign.getDisplays().contains(activeDisplay))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The campaing " + campaign.getId() + " is not enabled for display " + activeDisplay.getId());
 
@@ -56,15 +57,18 @@ public class CampaignController {
         model.addAttribute("campaign", campaign);
 
         if (campaign instanceof TextCampaign)
-            return "/campaigns/textcampaign.html";
+            return "campaigns/textcampaign.html";
         else if (campaign instanceof PictureCampaign)
-            return "/campaigns/picturecampaign.html";
+            return "campaigns/picturecampaign.html";
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested campaign method is not supported: " + campaign.getClass().getName());
     }
 
     @GetMapping(value = {"/campaigns/{id}/image", "/admin/campaigns/{id}/image"})
-    public void showCampaignImage(@PathVariable String id, HttpServletResponse response) throws IOException {
+    public void showCampaignImage(@PathVariable String id, HttpServletResponse response, Principal principal) throws IOException {
+
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:showCampaignImage({})", wrapper, id);
 
         Campaign campaign = campaignService.findById(Long.parseLong(id));
         if (campaign == null || !(campaign instanceof PictureCampaign))
@@ -78,7 +82,10 @@ public class CampaignController {
 
 
     @GetMapping("/admin/campaigns")
-    public String getCampaignIndex(Model model, @RequestParam(required = false) String displayId) {
+    public String getCampaignIndex(Model model, @RequestParam(required = false) String displayId, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getCampaignIndex()", wrapper);
+
         Iterable<Campaign> campaigns = null;
         Long id = null;
         if (displayId == null)
@@ -91,20 +98,26 @@ public class CampaignController {
         model.addAttribute("campaigns", campaigns);
         model.addAttribute("displays", displayService.findAll(false));
         model.addAttribute("filterDisplay", id);
-        return "/admin/campaigns";
+        return "admin/campaigns";
     }
 
     @GetMapping("/admin/campaigns/{id}")
-    public String getCampaignForPreview(Model model, @PathVariable Long id) {
+    public String getCampaignForPreview(Model model, @PathVariable Long id, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getCampaignForPreview({})", wrapper, id);
+
         Campaign campaign = campaignService.findById(id);
 
         model.addAttribute("campaign", campaign);
         model.addAttribute(campaign instanceof TextCampaign ? "textCampaign" : "pictureCampaign", campaign);
-        return "/admin/viewcampaign";
+        return "admin/viewcampaign";
     }
 
-    @RequestMapping("/admin/campaigns/create/text")
-    public String getTextCampaignCreate(Model model) {
+    @GetMapping("/admin/campaigns/create/text")
+    public String getTextCampaignCreate(Model model, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getTextCampaignCreate()", wrapper);
+
         CampaignCommand campaign = new CampaignCommand();
         //set default values
         campaign.setType(TextCampaign.CMP_TYPE);
@@ -120,11 +133,14 @@ public class CampaignController {
 
         model.addAttribute("campaign", campaign);
         model.addAttribute("displays", displays);
-        return "/admin/createtextcam";
+        return "admin/createtextcam";
     }
 
     @PostMapping("/admin/campaigns/createtextprocess")
-    public String processCreateTextCampaign(Model model, @ModelAttribute CampaignCommand command) {
+    public String processCreateTextCampaign(Model model, @ModelAttribute CampaignCommand command, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:processCreateTextCampaign({})", wrapper, command);
+
         if (command.getName() == null || command.getName().trim().length() == 0)
             throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
         if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
@@ -143,8 +159,11 @@ public class CampaignController {
         return "redirect:/admin/campaigns";
     }
 
-    @RequestMapping("/admin/campaigns/create/picture")
-    public String getPictureCampaignCreate(Model model) {
+    @GetMapping("/admin/campaigns/create/picture")
+    public String getPictureCampaignCreate(Model model, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getPictureCampaignCreate()", wrapper);
+
         CampaignCommand campaign = new CampaignCommand();
         //set default values
         campaign.setType(PictureCampaign.CMP_TYPE);
@@ -157,11 +176,14 @@ public class CampaignController {
 
         model.addAttribute("campaign", campaign);
         model.addAttribute("displays", displays);
-        return "/admin/createpicturecam";
+        return "admin/createpicturecam";
     }
 
     @PostMapping("/admin/campaigns/createpicprocess")
-    public String processCreatePictureCampaign(Model model, @ModelAttribute CampaignCommand command, @RequestParam("picture") MultipartFile file) {
+    public String processCreatePictureCampaign(Model model, @ModelAttribute CampaignCommand command, @RequestParam("picture") MultipartFile file, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:processCreatePictureCampaign({}, {})", wrapper, command, (file != null ? file.getName() : "null"));
+
         if (command.getName() == null || command.getName().trim().length() == 0)
             throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
         if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
@@ -188,8 +210,11 @@ public class CampaignController {
 
         return "redirect:/admin/campaigns";
     }
-    @RequestMapping("/admin/campaigns/{id}/modify")
-    public String getModifyCampaign(Model model, @PathVariable Long id) {
+
+    @GetMapping("/admin/campaigns/{id}/modify")
+    public String getModifyCampaign(Model model, @PathVariable Long id, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:getModifyCampaign({})", wrapper, id);
 
         Set<Display> displays = displayService.findAll(false);
 
@@ -199,11 +224,13 @@ public class CampaignController {
         model.addAttribute("campaign", command);
         model.addAttribute("displays", displays);
 
-        return "/admin/modifycam";
+        return "admin/modifycam";
     }
 
     @PostMapping("/admin/campaigns/modifyprocess")
-    public String processModifyCampaign(@ModelAttribute CampaignCommand command) {
+    public String processModifyCampaign(@ModelAttribute CampaignCommand command, Principal principal) {
+        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
+        log.info("{}: CC:processModifyCampaign({})", wrapper, command);
         if (command.getName() == null || command.getName().trim().length() == 0)
             throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
         if (command.getStart() == null)

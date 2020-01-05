@@ -9,4 +9,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findByName(String name);
 
     Iterable<User> findByRole(UserRole role);
+
+    Long countByRole(UserRole role);
 }
