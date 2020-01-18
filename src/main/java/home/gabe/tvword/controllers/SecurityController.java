@@ -43,6 +43,7 @@ public class SecurityController extends WebSecurityConfigurerAdapter {
                 .antMatchers("/campaigns/**").hasRole("DISPLAY")
                 //.antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/login**").permitAll()
+                .antMatchers("/idokep/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

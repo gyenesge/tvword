@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="imageUrls" type="java.util.List<String>"*/-->
+<!--/*@thymesVar id="filenames" type="java.util.List<String>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>Image List</title>
+</head>
+<body>
+
+<h2>Image URLs</h2>
+<p th:each="url : ${imageUrls}" th:text="${url}">url</p>
+
+<h2>File names</h2>
+<p th:each="file : ${filenames}" th:text="${file}">filename</p>
+
+</body>
+</html>
