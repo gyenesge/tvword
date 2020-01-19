@@ -1,5 +1,6 @@
 package home.gabe.tvword.controllers;
 
+import home.gabe.tvword.services.TvUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,6 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityController extends WebSecurityConfigurerAdapter {
 
     private PasswordEncoder passwordEncoder;
+    private TvUserDetailsService userDetailsService;
+
+    @Autowired
+    public void setUserDetailsService(TvUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
@@ -57,7 +64,9 @@ public class SecurityController extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessUrl("/login")
                 .and()
-                .rememberMe().key("6ax-;SYLE*m5Wv::xUvDnD%")
+                .rememberMe()
+                .key("6ax-;SYLE*m5Wv::xUvDnD%")
+                .userDetailsService(userDetailsService)
         ;
 
         //http.headers().frameOptions().disable();

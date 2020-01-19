@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="lastRun" type="java.lang.String"*/-->
+<!--/*@thymesVar id="logs" type="java.util.List<String>"*/-->
 <head>
     <meta charset="UTF-8">
     <title>Image List</title>
 </head>
 <body>
 
-<h2>Last Run</h2>
-<p th:text="${lastRun}">url</p>
+<h2>List of runs since the last start-up:</h2>
+<p th:each="log : ${logs}" th:text="${log}">url</p>
 
 </body>
 </html>

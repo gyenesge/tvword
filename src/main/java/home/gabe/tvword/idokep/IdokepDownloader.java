@@ -23,7 +23,7 @@ public class IdokepDownloader {
     public final static String IMG_PREFIX = "/automata/zoldarnotert";
     public final static String FILE_PREFIX = "target/";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
-    private String lastRun = null;
+    private List<String> logList = new ArrayList<>();
     private String lastScheduledRun = null;
 
     public List<String> getImageUrls() {
@@ -44,11 +44,11 @@ public class IdokepDownloader {
 
     @Scheduled(cron = "0 * 0 ? * *")
     public void downloadPictures() {
-        log.info("Start scheduled picture download.");
-        downloadPictures(getImageUrls());
+        log.info("Idokep: Start scheduled picture download.");
+        downloadPictures(getImageUrls(), "Scheduled");
     }
 
-    public List<String> downloadPictures(List<String> urlList) {
+    public List<String> downloadPictures(List<String> urlList, String logMessage) {
         List<String> result = new ArrayList<>();
 
         String timestamp = LocalDateTime.now().format(FORMATTER);
@@ -70,13 +70,13 @@ public class IdokepDownloader {
                 log.error("Unable to receive image list. ", ioe);
             }
         }
-        lastRun = FORMATTER.format(LocalDateTime.now());
+        logList.add(FORMATTER.format(LocalDateTime.now()) + ": " + logMessage);
 
         return result;
     }
 
-    public String getLastRun() {
-        return lastRun;
+    public List<String> getLogList() {
+        return logList;
     }
 
 }
