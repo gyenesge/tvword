@@ -42,7 +42,7 @@ public class IdokepDownloader {
         return result;
     }
 
-    @Scheduled(cron = "0 * 0 ? * *")
+    @Scheduled(cron = "0 1 0 ? * *")
     public void downloadPictures() {
         log.info("Idokep: Start scheduled picture download.");
         downloadPictures(getImageUrls(), "Scheduled");
