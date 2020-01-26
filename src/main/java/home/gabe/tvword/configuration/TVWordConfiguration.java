@@ -1,7 +1,5 @@
 package home.gabe.tvword.configuration;
 
-import home.gabe.tvword.services.DateToStringConverter;
-import home.gabe.tvword.services.StringToDateConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -34,6 +32,8 @@ public class TVWordConfiguration implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new DateToStringConverter());
         registry.addConverter(new StringToDateConverter());
+        registry.addConverter(new DateTimeToStringConverter());
+        registry.addConverter(new StringToDateTimeConverter());
     }
 
     @Bean

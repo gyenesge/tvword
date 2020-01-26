@@ -1,5 +1,6 @@
 package home.gabe.tvword.model;
 
+import home.gabe.tvword.controllers.TVWordException;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -22,6 +23,15 @@ public class UserRole {
     public UserRole(String id, String description) {
         this.id = id;
         this.description = description;
+    }
+
+    public static UserRole findRoleById(String roleFilter) {
+        if (DISPLAY.id.equals(roleFilter))
+            return DISPLAY;
+        else if (ADMIN.id.equals(roleFilter))
+            return ADMIN;
+
+        throw new TVWordException("Invalid role id: " + roleFilter, TVWordException.EC_GENERAL_ERROR);
     }
 
     public String getSpringRoleName() {

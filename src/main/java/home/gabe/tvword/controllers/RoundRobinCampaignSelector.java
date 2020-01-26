@@ -5,7 +5,7 @@ import home.gabe.tvword.model.Status;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class RoundRobinCampaignSelector implements CampaignSelector {
         if (campaigns == null || campaigns.size() == 0)
             return null;
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
 
         Map<Long, Integer> occurences = (Map<Long, Integer>) session.getAttribute(CAMPAIGN_SELECTOR_ROUND_ROBIN);
         if (occurences == null) {

@@ -3,7 +3,7 @@ package home.gabe.tvword.model.web;
 import home.gabe.tvword.model.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -14,8 +14,8 @@ public class CampaignCommand {
     private CampaignType type;
 
     private String name;
-    private LocalDateTime start;
-    private LocalDateTime expiry;
+    private LocalDate start;
+    private LocalDate expiry;
 
     private Display[] displays;
     private Boolean[] displayEnablement;

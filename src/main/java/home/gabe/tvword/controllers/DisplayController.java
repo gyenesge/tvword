@@ -1,9 +1,11 @@
 package home.gabe.tvword.controllers;
 
+import home.gabe.tvword.model.AuditEvent;
 import home.gabe.tvword.model.Campaign;
 import home.gabe.tvword.model.Display;
 import home.gabe.tvword.model.web.CreateDisplayCommand;
 import home.gabe.tvword.model.web.ModifyDisplayCommand;
+import home.gabe.tvword.services.AuditService;
 import home.gabe.tvword.services.CampaignService;
 import home.gabe.tvword.services.DisplayService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +29,14 @@ public class DisplayController {
     private DisplayService displayService;
     private CampaignService campaignService;
     private CampaignSelector campaignSelector;
+    private AuditService auditService;
 
-    public DisplayController(DisplayService displayService, CampaignService campaignService, CampaignSelector campaignSelector) {
+    public DisplayController(DisplayService displayService, CampaignService campaignService, CampaignSelector campaignSelector, AuditService auditService) {
         this.displayService = displayService;
         this.campaignService = campaignService;
         this.campaignSelector = campaignSelector;
+        this.auditService = auditService;
     }
-
 
     @GetMapping("/displays/start")
     public String startDisplay(Model model,
@@ -56,6 +59,7 @@ public class DisplayController {
             return "redirect:/displays/next";
         }
 
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CONFIG_PAGE);
         return "displays/displayconfig";
     }
 
@@ -82,9 +86,11 @@ public class DisplayController {
 
         if (campaign == null) {
             log.info("There is no valid campaign for display {}.", display);
+            auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_EXECUTE_CAMPAIGN, null);
             return "displays/no_campaign";
         }
 
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_EXECUTE_CAMPAIGN, campaign.getId());
         return "redirect:/campaigns/" + campaign.getId();
     }
 
@@ -101,6 +107,7 @@ public class DisplayController {
         model.addAttribute("autostart", autostart);
         model.addAttribute("display", display);
 
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CONFIG_PAGE);
         return "displays/displayconfig";
     }
 
@@ -132,7 +139,9 @@ public class DisplayController {
 
         if (!command.getPassword1().equals(command.getPassword2()))
             throw new IllegalArgumentException("Password missmatch.");
-        displayService.register(command.getName(), command.getNote(), command.getPassword1());
+        Display display = displayService.register(command.getName(), command.getNote(), command.getPassword1());
+
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CREATE_DISPLAY, display.getId());
         return "redirect:/admin/displays";
     }
 
@@ -162,6 +171,7 @@ public class DisplayController {
         if (!command.getPassword1().equals(command.getPassword2()))
             throw new IllegalArgumentException("Password missmatch.");
         displayService.update(command);
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_MODIFY_DISPLAY, command.getId());
         return "redirect:/admin/displays";
     }
 

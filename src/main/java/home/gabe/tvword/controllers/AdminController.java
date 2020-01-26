@@ -1,7 +1,9 @@
 package home.gabe.tvword.controllers;
 
+import home.gabe.tvword.model.AuditEvent;
 import home.gabe.tvword.model.web.PasswordCommand;
 import home.gabe.tvword.services.AdminService;
+import home.gabe.tvword.services.AuditService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +17,13 @@ import java.security.Principal;
 @Slf4j
 @Controller
 public class AdminController {
-    private AdminService adminService;
 
-    public AdminController(AdminService adminService) {
+    private AdminService adminService;
+    private AuditService auditService;
+
+    public AdminController(AdminService adminService, AuditService auditService) {
         this.adminService = adminService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/admin/changepwd")
@@ -40,6 +45,7 @@ public class AdminController {
         log.info("{}: AC: processChangePassword()", wrapper); //not logging password fields
 
         adminService.changePassword(wrapper.getUser(), command);
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CHANGE_PASSWORD);
 
         return "redirect:/admin/changepwd?success=true";
     }

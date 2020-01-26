@@ -1,11 +1,18 @@
 package home.gabe.tvword.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Campaign {
@@ -19,73 +26,14 @@ public class Campaign {
 
     @Column(unique = true)
     private String name;
-    private LocalDateTime start;
-    private LocalDateTime expiry;
+    private LocalDate start;
+    private LocalDate expiry;
 
     @ManyToMany(mappedBy = "campaigns")
     private Set<Display> displays = new HashSet<>();
 
     @ManyToOne
     private Status status = Status.ACTIVE;
-
-    public Campaign() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public CampaignType getType() {
-        return type;
-    }
-
-    public void setType(CampaignType type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDateTime getStart() {
-        return start;
-    }
-
-    public void setStart(LocalDateTime start) {
-        this.start = start;
-    }
-
-    public LocalDateTime getExpiry() {
-        return expiry;
-    }
-
-    public void setExpiry(LocalDateTime expiry) {
-        this.expiry = expiry;
-    }
-
-    public Set<Display> getDisplays() {
-        return displays;
-    }
-
-    public void setDisplays(Set<Display> displays) {
-        this.displays = displays;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class User {
+public class User implements Comparable<User> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,4 +31,8 @@ public class User {
     protected Status status = Status.ACTIVE;
 
 
+    @Override
+    public int compareTo(User user) {
+        return name.compareTo(user.name);
+    }
 }

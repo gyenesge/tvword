@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="users" type="java.util.List<home.gabe.tvword.model.User>"*/-->
+<!--/*@thymesVar id="events" type="java.util.List<home.gabe.tvword.model.AuditEvent>"*/-->
+<!--/*@thymesVar id="filter" type="home.gabe.tvword.model.web.AuditFilterCommand"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{title.auditLog}">Audit Log</title>
+</head>
+<body>
+<h1 th:text="#{title.auditLog}">Audit Log</h1>
+
+<p th:text="#{msg.campaigns}">Here you can browse events of the application:</p>
+<form method="get" th:action="@{/admin/auditLog}" th:object="${filter}">
+    <span th:text="#{label.filters}">Filters:</span>
+    <select id="roleFilter" th:field="*{roleFilter}">
+        <option th:text="#{item.allRoles}" th:value="${'all'}">all roles</option>
+        <option th:selected="${'ADMIN'.equals(filter.roleFilter)}" th:text="#{role.ADMIN}" th:value="ADMIN">Admin
+        </option>
+        <option th:selected="${'DISPLAY'.equals(filter.roleFilter)}" th:text="#{role.DISPLAY}" th:value="DISPLAY">
+            Display
+        </option>
+    </select>
+    <select id="userFilter" th:field="*{userFilter}">
+        <option th:text="#{item.allUsers}" th:value="${-1}">all users</option>
+        <option th:each="user : ${users}" th:selected="${user.id==filter.userFilter}"
+                th:text="${user.name} + ' (' + ${user.role.id} + ')'"
+                th:value="${user.id}">Display 1
+        </option>
+    </select>
+    <input id="fromDate" th:field="*{from}">
+    <input id="toDate" th:field="*{to}">
+    <input th:value="#{button.refresh}" type="submit">
+</form>
+<p></p>
+<div th:if="${!events.isEmpty()}">
+    <table border="1px">
+        <thead>
+        <th th:text="#{header.id}">Id</th>
+        <th th:text="#{header.timestamp}">Timestamp</th>
+        <th th:text="#{header.user}">User</th>
+        <th th:text="#{header.event}">Event</th>
+        <th th:tex="#{header.objectId}">Object Id</th>
+        </thead>
+        <tr th:each="event : ${events}">
+            <td th:text="${event.id}">5</td>
+            <td th:text="${{event.timestamp}}">2019-12-21 12:34:21</td>
+            <td th:text="${event.user}">Display 1</td>
+            <td th:text="${event.event}">Execute campaign</td>
+            <td th:text="${event.objectId}">3</td>
+        </tr>
+    </table>
+</div>
+<div th:if="${events.isEmpty()}" th:text="#{msg.noEventList}">There is no audit log event with these filters. You may
+    consider changing the filters.
+</div>
+
+
+<script lang="application/javascript">
+    function filterList(selectComponent) {
+        var displayId = selectComponent.options[selectComponent.selectedIndex].value;
+        var url = '/admin/campaigns';
+        if (displayId >= 0)
+            url = url + '?displayId=' + displayId;
+
+        window.open(url, '_self');
+    }
+</script>
+</body>
+</html>

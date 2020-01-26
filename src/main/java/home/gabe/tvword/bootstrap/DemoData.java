@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Slf4j
@@ -77,8 +77,8 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         text.setText("This is a test campaign text for display 1.");
         text.setBkgColor("#088");
         text.setTextColor("#00f");
-        text.setStart(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
-        text.setExpiry(LocalDateTime.now().plus(3, ChronoUnit.MONTHS));
+        text.setStart(LocalDate.now().plus(-1, ChronoUnit.MONTHS));
+        text.setExpiry(LocalDate.now().plus(3, ChronoUnit.MONTHS));
         assign(textDisplay, text);
 
         TextCampaign text2 = new TextCampaign();
@@ -86,8 +86,8 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         text2.setText("A Mészáros és Mészáros Kft. rendelkezik radioaktív hulladéktárolókkal és nukleáris létesítményekkel kapcsolatos épületek kivitelezéséhez szükséges minősítéssel.");
         text2.setBkgColor("#700");
         text2.setTextColor("#fff");
-        text2.setStart(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
-        text2.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.DAYS));
+        text2.setStart(LocalDate.now().plus(-1, ChronoUnit.MONTHS));
+        text2.setExpiry(LocalDate.now().plus(1, ChronoUnit.DAYS));
         assign(textDisplay, text2);
 
         TextCampaign expText = new TextCampaign();
@@ -95,8 +95,8 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         expText.setText("This is an expired campaign for display 1.");
         expText.setBkgColor("#008");
         expText.setTextColor("#f0f");
-        expText.setStart(LocalDateTime.now().plus(-2, ChronoUnit.MONTHS));
-        expText.setExpiry(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
+        expText.setStart(LocalDate.now().plus(-2, ChronoUnit.MONTHS));
+        expText.setExpiry(LocalDate.now().plus(-1, ChronoUnit.MONTHS));
         assign(textDisplay, expText);
 
         TextCampaign deletedText = new TextCampaign();
@@ -104,8 +104,8 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         deletedText.setText("This is a deleted campaign for display 1.");
         deletedText.setBkgColor("#008");
         deletedText.setTextColor("#f0f");
-        deletedText.setStart(LocalDateTime.now().plus(-2, ChronoUnit.MONTHS));
-        deletedText.setExpiry(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
+        deletedText.setStart(LocalDate.now().plus(-2, ChronoUnit.MONTHS));
+        deletedText.setExpiry(LocalDate.now().plus(-1, ChronoUnit.MONTHS));
         deletedText.setStatus(Status.DELETED);
         assign(textDisplay, deletedText);
 
@@ -123,15 +123,15 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
         PictureCampaign picture = new PictureCampaign();
         picture.setImage(loadImageResource("/demodata/martonnap.jpg", Image.FORMAT_JPG));
         picture.setName("Mártonnapi kampány");
-        picture.setStart(LocalDateTime.now().plus(-1, ChronoUnit.MONTHS));
-        picture.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.MONTHS));
+        picture.setStart(LocalDate.now().plus(-1, ChronoUnit.MONTHS));
+        picture.setExpiry(LocalDate.now().plus(1, ChronoUnit.MONTHS));
         assign(pictureDisplay, picture);
 
         PictureCampaign picture2 = new PictureCampaign();
         picture2.setImage(loadImageResource("/demodata/ujbor_unnepe.jpg", Image.FORMAT_JPG));
         picture2.setName("Újbor kampány");
-        picture2.setStart(LocalDateTime.now().plus(-2, ChronoUnit.MONTHS));
-        picture2.setExpiry(LocalDateTime.now().plus(2, ChronoUnit.MONTHS));
+        picture2.setStart(LocalDate.now().plus(-2, ChronoUnit.MONTHS));
+        picture2.setExpiry(LocalDate.now().plus(2, ChronoUnit.MONTHS));
         assign(pictureDisplay, picture2);
         campaignRepository.save(picture2);
         campaignRepository.save(picture);

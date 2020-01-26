@@ -1,4 +1,4 @@
-package home.gabe.tvword.controllers;
+package home.gabe.tvword.configuration;
 
 import home.gabe.tvword.services.TvUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
-public class SecurityController extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private PasswordEncoder passwordEncoder;
     private TvUserDetailsService userDetailsService;

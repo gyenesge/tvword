@@ -2,6 +2,7 @@ package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.*;
 import home.gabe.tvword.model.web.CampaignCommand;
+import home.gabe.tvword.services.AuditService;
 import home.gabe.tvword.services.CampaignService;
 import home.gabe.tvword.services.DisplayService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
@@ -28,10 +28,12 @@ public class CampaignController {
 
     private CampaignService campaignService;
     private DisplayService displayService;
+    private AuditService auditService;
 
-    public CampaignController(CampaignService campaignService, DisplayService displayService) {
+    public CampaignController(CampaignService campaignService, DisplayService displayService, AuditService auditService) {
         this.campaignService = campaignService;
         this.displayService = displayService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/campaigns/{id}")
@@ -121,8 +123,8 @@ public class CampaignController {
         CampaignCommand campaign = new CampaignCommand();
         //set default values
         campaign.setType(TextCampaign.CMP_TYPE);
-        campaign.setStart(LocalDateTime.now());
-        campaign.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.MONTHS));
+        campaign.setStart(LocalDate.now());
+        campaign.setExpiry(LocalDate.now().plus(1, ChronoUnit.MONTHS));
         campaign.setBkgColor("#FFF");
         campaign.setTextColor("#000");
         campaign.setText("Lorem ipsum, dolor sit amet...");
@@ -143,7 +145,7 @@ public class CampaignController {
 
         if (command.getName() == null || command.getName().trim().length() == 0)
             throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
-        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
+        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now()))
             throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_START);
         if (command.getExpiry() == null || command.getExpiry().isBefore(command.getStart()))
             throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_EXPIRY);
@@ -155,7 +157,8 @@ public class CampaignController {
             throw new TVWordException("At least one display must be selected for the campaign.", TVWordException.EC_DISPLAY_NOT_ENABLED);
 
         command.initDisplays(displayService.findAll(false));
-        campaignService.create(command.toTextCampaign());
+        Campaign campaign = campaignService.create(command.toTextCampaign());
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CREATE_CAMPAIGN, campaign.getId());
         return "redirect:/admin/campaigns";
     }
 
@@ -167,8 +170,8 @@ public class CampaignController {
         CampaignCommand campaign = new CampaignCommand();
         //set default values
         campaign.setType(PictureCampaign.CMP_TYPE);
-        campaign.setStart(LocalDateTime.now());
-        campaign.setExpiry(LocalDateTime.now().plus(1, ChronoUnit.MONTHS));
+        campaign.setStart(LocalDate.now());
+        campaign.setExpiry(LocalDate.now().plus(1, ChronoUnit.MONTHS));
 
         Set<Display> displays = displayService.findAll(false);
 
@@ -186,7 +189,7 @@ public class CampaignController {
 
         if (command.getName() == null || command.getName().trim().length() == 0)
             throw new TVWordException("Name of campaign is mandatory for text campaign.", TVWordException.EC_NAME_MISSING);
-        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now().atStartOfDay()))
+        if (command.getStart() == null || command.getStart().isBefore(LocalDate.now()))
             throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_START);
         if (command.getExpiry() == null || command.getExpiry().isBefore(command.getStart()))
             throw new TVWordException("Invalid start date.", TVWordException.EC_INVALID_EXPIRY);
@@ -206,7 +209,8 @@ public class CampaignController {
         command.initDisplays(displayService.findAll(false));
         command.setImage(image);
 
-        campaignService.create(command.toPictureCampaign());
+        Campaign campaign = campaignService.create(command.toPictureCampaign());
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CREATE_CAMPAIGN, campaign.getId());
 
         return "redirect:/admin/campaigns";
     }
@@ -244,6 +248,7 @@ public class CampaignController {
 
         command.initDisplays(displayService.findAll(false));
         campaignService.update(command);
+        auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_MODIFY_CAMPAIGN, command.getId());
 
         return "redirect:/admin/campaigns";
     }
