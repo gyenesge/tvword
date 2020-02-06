@@ -45,12 +45,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/idokep/**").hasRole("ADMIN")
                 .antMatchers("/displays").hasRole("DISPLAY")
                 .antMatchers("/displays/**").hasRole("DISPLAY")
                 .antMatchers("/campaigns/**").hasRole("DISPLAY")
                 //.antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/login**").permitAll()
-                .antMatchers("/idokep/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
