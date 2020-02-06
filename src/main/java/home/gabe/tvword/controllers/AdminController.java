@@ -32,8 +32,10 @@ public class AdminController {
         log.info("{}: AC: getChangePasswordForm(success={})", wrapper, success);
 
         Boolean bool = Boolean.parseBoolean(success);
+        PasswordCommand command = new PasswordCommand();
+        command.setUsername(wrapper.getUser().getName());
 
-        model.addAttribute("pwdCommand", new PasswordCommand());
+        model.addAttribute("pwdCommand", command);
         model.addAttribute("success", bool);
 
         return "admin/changepwd";

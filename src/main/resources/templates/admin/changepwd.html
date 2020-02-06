@@ -11,18 +11,20 @@
 <div th:if="${success}" th:text="#{msg.successfulPasswordChange}">Your password has been change successfully.</div>
 
 <form method="post" th:action="@{/admin/changepwd_process}" th:object="${pwdCommand}">
+    <input autocomplete="username" id="username" th:value="${pwdCommand.getUsername()}" type="hidden"/>
     <table>
         <tr>
             <td><label for="oldPassword" th:text="#{label.oldPassword}">Name: </label></td>
-            <td><input id="oldPassword" th:field="*{oldPassword}" type="password"/></td>
+            <td><input autocomplete="current-password" id="oldPassword" th:field="*{oldPassword}" type="password"/></td>
         </tr>
         <tr>
             <td><label for="newPassword" th:text="#{label.newPassword}">Name: </label></td>
-            <td><input id="newPassword" th:field="*{newPassword}" type="password"/></td>
+            <td><input autocomplete="new-password" id="newPassword" th:field="*{newPassword}" type="password"/></td>
         </tr>
         <tr>
             <td><label for="confirmPassword" th:text="#{label.confirmPassword}">Name: </label></td>
-            <td><input id="confirmPassword" th:field="*{confirmPassword}" type="password"/></td>
+            <td><input autocomplete="new-password" id="confirmPassword" th:field="*{confirmPassword}" type="password"/>
+            </td>
         </tr>
         <td><input id="submit" th:value="#{button.changePwd}" type="submit"></td>
         </tr>
