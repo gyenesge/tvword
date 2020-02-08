@@ -22,43 +22,69 @@ public class IdokepDownloader {
     public final static String INDEX_URL = BASE_URL + "/automata/zoldarnotert";
     public final static String IMG_PREFIX = "/automata/zoldarnotert";
     public final static String FILE_PREFIX = "target/";
+
+    public final static long RETRY_SECS = 30;
+    public final static int RETRY_COUNT = 5;
+
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
     private List<String> logList = new ArrayList<>();
     private String lastScheduledRun = null;
 
+
+    @Scheduled(cron = "0 2 0 ? * *")
+    public void downloadPictures() {
+        log.info("Idokep: Start scheduled picture download.");
+        List<String> imageUrls = null;
+        for (int i = 0; i < RETRY_COUNT; i++) {
+            imageUrls = getImageUrls();
+
+            if (imageUrls != null)
+                break; // image URLs found.
+
+            log.info("No images found. Retrying in {} seconds.", RETRY_SECS);
+            try {
+                this.wait(RETRY_SECS * 1000L);
+            } catch (InterruptedException e) {
+                log.error("Retry period is interrupted.", e);
+            }
+        }
+
+        if (imageUrls == null) {
+            //failed to get images: log and exit
+            logList.add(FORMATTER.format(LocalDateTime.now()) + ": failed to get image URLs today.");
+            return;
+        }
+
+        downloadPictures(imageUrls, "Scheduled");
+    }
+
     public List<String> getImageUrls() {
-        List<String> result = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(INDEX_URL).get();
 
+            List<String> result = new ArrayList<>();
             doc.select("img").forEach(img -> {
                 String src = img.attr("src");
                 if (src.startsWith(IMG_PREFIX))
                     result.add(src);
             });
+            return result;
         } catch (IOException ioe) {
             log.error("Unable to receive image list. ", ioe);
         }
-        return result;
+        return null;
     }
 
-    @Scheduled(cron = "0 1 0 ? * *")
-    public void downloadPictures() {
-        log.info("Idokep: Start scheduled picture download.");
-        downloadPictures(getImageUrls(), "Scheduled");
-    }
 
     public List<String> downloadPictures(List<String> urlList, String logMessage) {
         List<String> result = new ArrayList<>();
 
         String timestamp = LocalDateTime.now().format(FORMATTER);
         for (String url : urlList) {
+            String filename = FILE_PREFIX + timestamp + url.substring(IMG_PREFIX.length(), url.indexOf(".png")) + ".png";
             try {
                 //Open a URL Stream
                 Connection.Response response = Jsoup.connect(BASE_URL + url).ignoreContentType(true).execute();
-
-                //prepare file name
-                String filename = FILE_PREFIX + timestamp + url.substring(IMG_PREFIX.length(), url.indexOf(".png")) + ".png";
 
                 // output here
                 FileOutputStream out = new FileOutputStream(new File(filename));
@@ -67,10 +93,11 @@ public class IdokepDownloader {
 
                 result.add(filename);
             } catch (IOException ioe) {
-                log.error("Unable to receive image list. ", ioe);
+                log.error("Unable to receive image: " + filename, ioe);
+                logList.add(FORMATTER.format(LocalDateTime.now()) + ": failed to get " + filename);
             }
         }
-        logList.add(FORMATTER.format(LocalDateTime.now()) + ": " + logMessage);
+        logList.add(FORMATTER.format(LocalDateTime.now()) + ": " + logMessage + " (number of files: " + result.size() + ")");
 
         return result;
     }
