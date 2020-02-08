@@ -4,10 +4,12 @@ import home.gabe.tvword.model.PersistentLogin;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
 
+@Transactional
 @Repository
 public class TokenRepository implements PersistentTokenRepository {
     private PersistentLoginRepository loginRepository;
