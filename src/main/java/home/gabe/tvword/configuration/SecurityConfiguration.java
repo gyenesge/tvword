@@ -1,5 +1,6 @@
 package home.gabe.tvword.configuration;
 
+import home.gabe.tvword.repositories.TokenRepository;
 import home.gabe.tvword.services.TvUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private PasswordEncoder passwordEncoder;
     private TvUserDetailsService userDetailsService;
+    private TokenRepository tokenRepository;
+
+    @Autowired
+    public void setTokenRepository(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     @Autowired
     public void setUserDetailsService(TvUserDetailsService userDetailsService) {
@@ -22,23 +29,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
-
- /*   @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("user")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
-                .and()
-                .withUser("display")
-                .password(passwordEncoder.encode("password"))
-                .roles("DISPLAY")
-                .and()
-                .withUser("admin")
-                .password(passwordEncoder.encode("password"))
-                .roles("ADMIN")
-        ;
-    }
-*/
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -66,6 +56,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()
                 .key("6ax-;SYLE*m5Wv::xUvDnD%")
+                .tokenRepository(tokenRepository)
                 .userDetailsService(userDetailsService)
         ;
 

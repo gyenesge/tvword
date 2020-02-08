@@ -5,7 +5,7 @@ import home.gabe.tvword.model.User;
 import home.gabe.tvword.services.BaseUserPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import java.security.Principal;
 
@@ -24,18 +24,20 @@ public class UserPrincipalWrapper {
         if (user != null) // cached user object
             return user;
 
-        if (!(principal instanceof UsernamePasswordAuthenticationToken)) {
+        Object principalObject = null;
+        if (principal instanceof Authentication) {
+            principalObject = ((Authentication) principal).getPrincipal();
+        } else {
             log.warn("Unknown principal class in session {}.", principal.getClass().getName());
             throw new AccessDeniedException("Unknown principal class in session: " + principal.getClass().getName());
         }
 
-        Object o = ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
-        if (!(o instanceof BaseUserPrincipal)) {
-            log.warn("Invalid principal object for this method call {}.", o.getClass().getName());
-            throw new AccessDeniedException("Only authenticated users can use this service: " + o.getClass().getName());
+        if (!(principalObject instanceof BaseUserPrincipal)) {
+            log.warn("Invalid principal object for this method call {}.", principalObject.getClass().getName());
+            throw new AccessDeniedException("Only authenticated users can use this service: " + principalObject.getClass().getName());
         }
 
-        this.user = ((BaseUserPrincipal) o).getUser();
+        this.user = ((BaseUserPrincipal) principalObject).getUser();
         return this.user;
     }
 
