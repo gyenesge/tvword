@@ -3,6 +3,7 @@ package home.gabe.tvword.controllers;
 import home.gabe.tvword.model.AuditEvent;
 import home.gabe.tvword.model.Campaign;
 import home.gabe.tvword.model.Display;
+import home.gabe.tvword.model.web.CampaignDataCommand;
 import home.gabe.tvword.model.web.CreateDisplayCommand;
 import home.gabe.tvword.model.web.ModifyDisplayCommand;
 import home.gabe.tvword.services.AuditService;
@@ -38,26 +39,30 @@ public class DisplayController {
         this.auditService = auditService;
     }
 
-    @GetMapping("/displays/start")
-    public String startDisplay(Model model,
-                               @CookieValue(value = "autostart", defaultValue = "false", required = false) boolean autostart,
-                               HttpServletRequest request,
-                               HttpServletResponse response,
-                               Principal principal) {
+    @GetMapping("/displays/start.json")
+    public String startDataDisplay(Model model,
+                                   @CookieValue(value = "autostart", defaultValue = "false", required = false) boolean autostart,
+                                   @RequestParam(value = "forcestart", defaultValue = "false", required = false) boolean forcestart,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   Principal principal) {
         UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
-        log.info("{}: DC:startDisplay()", wrapper);
+        log.info("{}: DC:startDataDisplay()", wrapper);
 
         Display display = wrapper.getDisplay();
-
-        model.addAttribute("autostart", autostart);
-        model.addAttribute("display", display);
 
         response.addCookie(createBooleanCookie(COOKIE_AUTOSTART, autostart));
 
         if (autostart) {
             log.info("Autostart activated for {} display.", display.getName());
-            return "redirect:/displays/next";
         }
+
+        if (autostart || forcestart) {
+            return "displays/campaignLoader";
+        }
+
+        model.addAttribute("autostart", autostart);
+        model.addAttribute("display", display);
 
         auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CONFIG_PAGE);
         return "displays/displayconfig";
@@ -72,11 +77,12 @@ public class DisplayController {
         return cookie;
     }
 
-    @GetMapping("/displays/next")
-    public String getNextCampaign(Principal principal,
-                                  HttpServletRequest request) {
+    @GetMapping("/displays/next.json")
+    public @ResponseBody
+    CampaignDataCommand getNextCampaignData(Principal principal,
+                                            HttpServletRequest request) {
         UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
-        log.info("{}: DC:getNextCampaign()", wrapper);
+        log.info("{}: DC:getNextCampaignData()", wrapper);
 
         Display display = wrapper.getDisplay();
 
@@ -85,14 +91,16 @@ public class DisplayController {
         Campaign campaign = campaignSelector.next(campaigns, request.getSession());
 
         if (campaign == null) {
-            log.info("There is no valid campaign for display {}.", display);
-            auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_EXECUTE_CAMPAIGN, null);
-            return "displays/no_campaign";
+            log.warn("Campaign is not available for display {} - {}.", display.getId(), display.getName());
+            CampaignDataCommand empty = CampaignDataCommand.empty();
+            empty.setText(display.getId() + " - " + display.getName());
+            return empty;
         }
 
         auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_EXECUTE_CAMPAIGN, campaign.getId());
-        return "redirect:/campaigns/" + campaign.getId();
+        return CampaignDataCommand.fromCampaign(campaign);
     }
+
 
     @GetMapping("/displays/config")
     public String getConfigPage(Principal principal,

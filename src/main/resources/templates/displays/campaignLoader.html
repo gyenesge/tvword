@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="noindex" name="robots">
+    <title th:text="#{title.campagins}">Campaigns</title>
+</head>
+
+<body style="background: black; padding: 0px; margin: 0px">
+
+<div id="pic-container" style="width: 100%; height: 100%; display: none">
+    <img id="main-pic" src="#" style="position: fixed"/>
+</div>
+
+<div id="text-container" style="display: none">
+    <div id="flex-text-panel" style="width: 100%; height: 100%; text-align: center;">
+        <span id="main-text" style="color:white;font-size:40px">The quick brown fox jumps over the lazy dog.</span>
+    </div>
+</div>
+
+
+<script th:src="@{/webjars/jquery/jquery.min.js}" type="application/javascript"></script>
+<script th:src="@{/js/jquery.textfill.min.js}" type="application/javascript"></script>
+<script th:src="@{/js/campaignLoader.js}" type="application/javascript"></script>
+
+</body>
+</html>

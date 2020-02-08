@@ -32,7 +32,7 @@
         setCookie("autostart", newRemember, 365);
 
         // start display sequence
-        var url = '/displays/next';
+        var url = '/displays/start.json?forcestart=true';
         window.open(url, '_self');
     }
 

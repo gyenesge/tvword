@@ -28,7 +28,7 @@ public class LoginController {
         log.info("{}: LC:getStartPage()", wrapper);
 
         if (wrapper.getUser() instanceof Display)
-            return "redirect:/displays/start";
+            return "redirect:/displays/start.json";
         return "redirect:/admin/displays";
     }
 

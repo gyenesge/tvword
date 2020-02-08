@@ -36,36 +36,6 @@ public class CampaignController {
         this.auditService = auditService;
     }
 
-    @GetMapping("/campaigns/{id}")
-    public String getCampaign(@PathVariable Long id,
-                              @CookieValue(value = "fullScreen", defaultValue = "false", required = false) boolean fullScreen,
-                              Principal principal,
-                              Model model) {
-        UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
-        log.info("{}: CC:getCampaign({})", wrapper, id);
-        Campaign campaign = campaignService.findById(id);
-        if (campaign == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unknown campaign ID: " + id);
-
-        if (!campaign.getStatus().equals(Status.ACTIVE))
-            throw new TVWordException("The selected campaign is not active: " + id, TVWordException.EC_CAMPAIGN_NOTACTIVE);
-
-        //validate permission and consistence (e.g. a campaign can be displayed only for authenticated device)
-        Display activeDisplay = wrapper.getDisplay();
-        if (!campaign.getDisplays().contains(activeDisplay))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "The campaing " + campaign.getId() + " is not enabled for display " + activeDisplay.getId());
-
-        model.addAttribute("fullScreen", fullScreen);
-        model.addAttribute("campaign", campaign);
-
-        if (campaign instanceof TextCampaign)
-            return "campaigns/textcampaign.html";
-        else if (campaign instanceof PictureCampaign)
-            return "campaigns/picturecampaign.html";
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requested campaign method is not supported: " + campaign.getClass().getName());
-    }
-
     @GetMapping(value = {"/campaigns/{id}/image", "/admin/campaigns/{id}/image"})
     public void showCampaignImage(@PathVariable String id, HttpServletResponse response, Principal principal) throws IOException {
 
