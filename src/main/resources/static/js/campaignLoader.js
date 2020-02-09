@@ -1,10 +1,41 @@
-const refreshPeriod = 12 * 1000; // millisec
+var display = null;
+var refreshPeriod = 12 * 1000; // millisec
+
+
+$(document).ready(function () {
+    //init javascript context
+
+    display = $("#display").data();
+
+    let rT = display["refreshtime"];
+    if (typeof rT !== 'undefined' && rT !== 'null') {
+        refreshPeriod = rT * 1000; // millisec
+    } else {
+        console.info("Invalid refresh time for display " + display["displayid"] + ": " + rT);
+    }
+
+
+    //register key events to handle config button to go back to config page
+    document.onkeypress = onCKeyPress;
+
+    //init campaign cycle
+    getNextCampaign();
+});
 
 function onCKeyPress(e) {
-    // 67 - C and 99 - c key are handled
+    // 67 - C and 99 - c key are handled as shortcut to the config page.
     if (e.which == 67 || e.which == 99) {
         window.open('/displays/config', '_self');
+    } else if (e.which == 68 || e.which == 100) {
+        //d or D opens the "detect panel"
+        if ($("#display").css("display") === "none") {
+            $("#windowSize").text($(window).width() + " x " + $(window).height());
+            $("#display").css("display", "block");
+        } else {
+            $("#display").css("display", "none");
+        }
     }
+    console.info(e.which);
 }
 
 function getNextCampaign() {
@@ -113,12 +144,6 @@ function clearAllTimeouts() {
         clearTimeout(i);
     }
 }
-
-//register key events to handle config button to go back to config page
-document.onkeypress = onCKeyPress;
-
-//init campaign cycle
-getNextCampaign();
 
 
 

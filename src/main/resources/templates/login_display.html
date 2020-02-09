@@ -9,7 +9,7 @@
 <body>
 <h1 th:text="#{title.login}">Display Login</h1>
 <p>
-    <a href="login?lang=en">English</a> | <a href="/login?lang=hu">Magyar</a>
+    <a href="login?lang=en">English</a> | <a href="login?lang=hu">Magyar</a>
 </p>
 <div th:if="${error}" th:text="#{error.invalidLogin}">Invalid login ID or password.</div>
 

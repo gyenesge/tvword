@@ -6,6 +6,7 @@ import lombok.Data;
 public class ModifyDisplayCommand {
     private Long id;
     private String note;
+    private Integer refreshTime;
     private String password1;
     private String password2;
     private String status;

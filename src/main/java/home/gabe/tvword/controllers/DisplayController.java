@@ -52,6 +52,8 @@ public class DisplayController {
         Display display = wrapper.getDisplay();
 
         response.addCookie(createBooleanCookie(COOKIE_AUTOSTART, autostart));
+        model.addAttribute("display", display);
+        model.addAttribute("autostart", autostart);
 
         if (autostart) {
             log.info("Autostart activated for {} display.", display.getName());
@@ -60,9 +62,6 @@ public class DisplayController {
         if (autostart || forcestart) {
             return "displays/campaignLoader";
         }
-
-        model.addAttribute("autostart", autostart);
-        model.addAttribute("display", display);
 
         auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CONFIG_PAGE);
         return "displays/displayconfig";
@@ -147,7 +146,8 @@ public class DisplayController {
 
         if (!command.getPassword1().equals(command.getPassword2()))
             throw new IllegalArgumentException("Password missmatch.");
-        Display display = displayService.register(command.getName(), command.getNote(), command.getPassword1());
+
+        Display display = displayService.register(command.getName(), command.getNote(), command.getRefreshTime(), command.getPassword1());
 
         auditService.logEvent(wrapper.getUser().getName(), AuditEvent.AE_CREATE_DISPLAY, display.getId());
         return "redirect:/admin/displays";
@@ -162,6 +162,7 @@ public class DisplayController {
 
         ModifyDisplayCommand command = new ModifyDisplayCommand(id);
         command.setNote(display.getNote());
+        command.setRefreshTime(display.getRefreshTime());
         command.setStatus(display.getStatus().getStatusCode());
 
         model.addAttribute("display", display);

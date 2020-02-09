@@ -13,7 +13,7 @@ public interface DisplayService {
 
     Set<Display> findAll(boolean showDeleted);
 
-    Display register(String name, String note, String password);
+    Display register(String name, String note, Integer refreshTime, String password);
 
     Display update(ModifyDisplayCommand command);
 

@@ -19,6 +19,10 @@ public class Display extends User {
      * Arbitrary comment, that can contain location info, type of device, instructions for the admin...
      */
     private String note;
+    /**
+     * Time period while display waits between switching campaigns.
+     */
+    private Integer refreshTime;
 
     /**
      * List of campaigns assigned to this display.

@@ -55,13 +55,14 @@ public class DisplayServiceImpl implements DisplayService {
     }
 
     @Override
-    public Display register(String name, String note, String password) {
+    public Display register(String name, String note, Integer refreshTime, String password) {
         if (name == null || password == null)
             throw new NullPointerException("Display cannot be created with null name or password.");
 
         var display = new Display();
         display.setName(name);
         display.setNote(note);
+        display.setRefreshTime(refreshTime);
         display.setHashedPassword(passwordEncoder.encode(password));
 
         return userRepository.save(display);
@@ -86,6 +87,7 @@ public class DisplayServiceImpl implements DisplayService {
             display.setHashedPassword(passwordEncoder.encode(command.getPassword1()));
         }
         display.setNote(command.getNote());
+        display.setRefreshTime(command.getRefreshTime());
         display.setStatus(Status.parse(command.getStatus()));
 
         return userRepository.save(display);

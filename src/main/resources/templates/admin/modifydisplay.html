@@ -23,12 +23,16 @@
             <td><textarea cols="50" id="note" rows="4" th:field="*{note}"></textarea></td>
         </tr>
         <tr>
+            <td><label for="refreshTime" th:text="#{label.refreshTime}">Refresh time (sec): </label></td>
+            <td><input autocomplete="refreshTime" id="refreshTime" th:field="*{refreshTime}"/></td>
+        </tr>
+        <tr>
             <td><label for="password1" th:text="#{label.password}">Password: </label></td>
-            <td><input id="password1" th:field="*{password1}" type="password"/></td>
+            <td><input autocomplete="no" id="password1" th:field="*{password1}" type="password"/></td>
         </tr>
         <tr>
             <td><label for="password2" th:text="#{label.confirmPassword}">Confirm password: </label></td>
-            <td><input id="password2" th:field="*{password2}" type="password"/></td>
+            <td><input autocomplete="no" id="password2" th:field="*{password2}" type="password"/></td>
         </tr>
         <tr>
             <td colspan="2"><span th:text="#{msg.emptyPasswordHint}">* If you leave the password empty, it won't be modified.</span>
