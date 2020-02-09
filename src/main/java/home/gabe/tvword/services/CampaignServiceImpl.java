@@ -1,15 +1,15 @@
 package home.gabe.tvword.services;
 
 import home.gabe.tvword.controllers.CampaignSelector;
-import home.gabe.tvword.model.Campaign;
-import home.gabe.tvword.model.Display;
-import home.gabe.tvword.model.User;
+import home.gabe.tvword.model.*;
 import home.gabe.tvword.model.web.CampaignCommand;
+import home.gabe.tvword.model.web.CampaignFilterCommand;
 import home.gabe.tvword.repositories.CampaignRepository;
 import home.gabe.tvword.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -57,6 +57,29 @@ public class CampaignServiceImpl implements CampaignService {
         if (user.isEmpty() || !(user.get() instanceof Display))
             throw new IllegalArgumentException("Unknown display with ID: " + displayId);
         return findByDisplay((Display) user.get());
+    }
+
+    @Override
+    public List<Campaign> findByFilter(CampaignFilterCommand filter) {
+        Display display = null;
+        if (filter.getDisplayId() != null && filter.getDisplayId() != CampaignFilterCommand.ALL_DISPLAYS) {
+            Optional<User> user = userRepository.findById(filter.getDisplayId());
+            if (user.isEmpty() || !(user.get() instanceof Display))
+                throw new IllegalArgumentException("Unknown display with ID: " + filter.getDisplayId());
+            display = (Display) user.get();
+        }
+
+        Status status = null;
+        if (filter.getStatus() != null && !filter.getStatus().equals(CampaignFilterCommand.ALL_STATUS)) {
+            status = Status.parse(filter.getStatus());
+        }
+
+        CampaignType type = null;
+        if (filter.getType() != null && !filter.getType().equals(CampaignFilterCommand.ALL_TYPE)) {
+            type = CampaignType.parse(filter.getType());
+        }
+
+        return campaignRepository.findAllByDisplaysAndStatusAndType(display, status, type);
     }
 
     @Override

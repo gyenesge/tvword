@@ -2,6 +2,7 @@ package home.gabe.tvword.controllers;
 
 import home.gabe.tvword.model.*;
 import home.gabe.tvword.model.web.CampaignCommand;
+import home.gabe.tvword.model.web.CampaignFilterCommand;
 import home.gabe.tvword.services.AuditService;
 import home.gabe.tvword.services.CampaignService;
 import home.gabe.tvword.services.DisplayService;
@@ -13,18 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
 @Controller
 public class CampaignController {
+    private final static String SESSION_CAMPAIGN_FILTER = "admin.campaign.filter";
 
     private CampaignService campaignService;
     private DisplayService displayService;
@@ -54,22 +59,30 @@ public class CampaignController {
 
 
     @GetMapping("/admin/campaigns")
-    public String getCampaignIndex(Model model, @RequestParam(required = false) String displayId, Principal principal) {
+    public String getCampaignIndex(Model model,
+                                   @ModelAttribute CampaignFilterCommand filter,
+                                   HttpServletRequest request,
+                                   Principal principal) {
         UserPrincipalWrapper wrapper = new UserPrincipalWrapper(principal);
         log.info("{}: CC:getCampaignIndex()", wrapper);
 
-        Iterable<Campaign> campaigns = null;
-        Long id = null;
-        if (displayId == null)
-            campaigns = campaignService.findAll();
-        else {
-            id = Long.parseLong(displayId);
-            campaigns = campaignService.findByDisplay(id);
+        HttpSession session = request.getSession();
+        if (filter == null || filter.getDisplayId() == null) {
+            //filter is not initialized
+            Object storedFilter = session.getAttribute(SESSION_CAMPAIGN_FILTER);
+            if (storedFilter != null && storedFilter instanceof CampaignFilterCommand) {
+                filter = (CampaignFilterCommand) storedFilter;
+            } else {
+                filter = CampaignFilterCommand.getDefault();
+            }
         }
+        session.setAttribute(SESSION_CAMPAIGN_FILTER, filter);
+
+        List<Campaign> campaigns = campaignService.findByFilter(filter);
 
         model.addAttribute("campaigns", campaigns);
         model.addAttribute("displays", displayService.findAll(false));
-        model.addAttribute("filterDisplay", id);
+        model.addAttribute("filter", filter);
         return "admin/campaigns";
     }
 

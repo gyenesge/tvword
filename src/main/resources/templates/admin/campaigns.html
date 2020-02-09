@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{fragments/layout :: layout (~{::body},'displays')}" xmlns:th="http://www.thymeleaf.org">
 <!--/*@thymesVar id="displays" type="java.util.Set<home.gabe.tvword.model.Display>"*/-->
-<!--/*@thymesVar id="campaigns" type="java.util.Set<home.gabe.tvword.model.Campaign>"*/-->
-<!--/*@thymesVar id="filterDisplay" type="java.lang.Long"*/-->
+<!--/*@thymesVar id="campaigns" type="java.util.List<home.gabe.tvword.model.Campaign>"*/-->
+<!--/*@thymesVar id="filter" type="home.gabe.tvword.model.web.CampaignFilterCommand"*/-->
 <head>
     <meta charset="UTF-8">
     <title th:text="#{title.campagins}">Campaigns</title>
@@ -11,15 +11,36 @@
 <h1 th:text="#{title.campagins}">Campaigns</h1>
 
 <p th:text="#{msg.campaigns}">Here you can find campaigns already defined for your organization:</p>
-<p>
+
+<form method="get" th:action="@{/admin/campaigns}" th:object="${filter}">
     <span th:text="#{label.filters}">Filters:</span>
-    <select id="displayFilter" onchange="filterList(this)">
+    <select id="display" th:field="*{displayId}">
         <option th:text="#{item.allDisplays}" th:value="${-1}">all displays</option>
-        <option th:each="display : ${displays}" th:selected="${display.id == filterDisplay}" th:text="${display.name}"
+        <option th:each="display : ${displays}" th:selected="${display.id == filter.displayId}"
+                th:text="${display.name}"
                 th:value="${display.id}">Display 1
         </option>
     </select>
-</p>
+
+    <select id="statusFilter" th:field="*{status}">
+        <option th:text="#{item.allStatuses}" th:value="${'all'}">all statuses</option>
+        <option th:selected="${'A'.equals(filter.status)}" th:text="#{status.A}" th:value="A">Active
+        </option>
+        <option th:selected="${'D'.equals(filter.status)}" th:text="#{status.D}" th:value="D">
+            Deleted
+        </option>
+    </select>
+    <select id="typeFilter" th:field="*{type}">
+        <option th:text="#{item.allTypes}" th:value="${'all'}">all types</option>
+        <option th:selected="${'P'.equals(filter.type)}" th:text="#{type.P}" th:value="P">Picture
+        </option>
+        <option th:selected="${'T'.equals(filter.type)}" th:text="#{type.T}" th:value="T">
+            Text
+        </option>
+    </select>
+    <input th:value="#{button.refresh}" type="submit">
+</form>
+<p></p>
 <table border="1px" th:if="${!campaigns.isEmpty()}">
     <thead>
     <th th:text="#{header.id}">ID</th>

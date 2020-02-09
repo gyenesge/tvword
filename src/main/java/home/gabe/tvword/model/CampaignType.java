@@ -69,4 +69,13 @@ public class CampaignType {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+    public static CampaignType parse(String string) {
+        if (string.equals(PictureCampaign.CMP_TYPE.getType())) {
+            return PictureCampaign.CMP_TYPE;
+        } else if (string.equals(TextCampaign.CMP_TYPE.getType())) {
+            return TextCampaign.CMP_TYPE;
+        }
+        throw new IllegalArgumentException("Invalid campaign type: " + string);
+    }
 }

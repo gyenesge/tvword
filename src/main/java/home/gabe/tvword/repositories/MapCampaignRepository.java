@@ -1,7 +1,9 @@
 package home.gabe.tvword.repositories;
 
 import home.gabe.tvword.model.Campaign;
+import home.gabe.tvword.model.CampaignType;
 import home.gabe.tvword.model.Display;
+import home.gabe.tvword.model.Status;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -58,6 +60,19 @@ public class MapCampaignRepository implements CampaignRepository {
                 .forEach(campaign -> matches.add(campaign));
 
         return matches;
+    }
+
+    @Override
+    public List<Campaign> findAllByDisplaysAndStatusAndType(Display display, Status status, CampaignType ctype) {
+        List<Campaign> result = new ArrayList<>();
+        for (Campaign campaign : campaigns.values()) {
+            if ((display == null || campaign.getDisplays().contains(display)) &&
+                    (status == null || campaign.getStatus().equals(status)) &&
+                    (ctype == null || campaign.getType().equals(ctype))) {
+                result.add(campaign);
+            }
+        }
+        return result;
     }
 
     @Override
