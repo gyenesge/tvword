@@ -73,15 +73,5 @@
 </div>
 </p>
 
-<script lang="application/javascript">
-    function filterList(selectComponent) {
-        var displayId = selectComponent.options[selectComponent.selectedIndex].value;
-        var url = '/admin/campaigns';
-        if (displayId >= 0)
-            url = url + '?displayId=' + displayId;
-
-        window.open(url, '_self');
-    }
-</script>
 </body>
 </html>

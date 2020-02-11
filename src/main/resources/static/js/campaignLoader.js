@@ -1,5 +1,8 @@
 var display = null;
 var refreshPeriod = 12 * 1000; // millisec
+let imageCache = {
+    '-1': null
+}
 
 
 $(document).ready(function () {
@@ -89,53 +92,66 @@ function setTextCampaign(data) {
 
 function setPictureCampaign(data) {
     //preload image
-    let image = new Image();
-    image.id = "main-pic";
-    image.src = "/campaigns/" + data["id"] + "/image";
-    image.onload = function () {
-        //hide other container
-        $('#text-container').css('display', 'none');
-        $(document.body).css('background', 'black');
-        $(document.body).css('margin', '0px');
-
-        //init container
-        let wh = $(window).height();
-        let ww = $(window).width();
-        let ih = this.height;
-        let iw = this.width;
-        let newh = ih;
-        let neww = iw;
-        let topp = 0;
-        let leftp = 0;
-
-        if (wh / ww < ih / iw) {
-            // the frame is lower
-            newh = wh;
-            neww = newh / ih * iw;
-            leftp = (ww - neww) / 2;
-        } else {
-            // frame is higher
-            neww = ww;
-            newh = neww / iw * ih;
-            topp = (wh - newh) / 2;
+    let image = imageCache[data["id"]];
+    if (typeof image === 'undefined') {
+        //image is not yet cached
+        image = new Image();
+        image.id = "main-pic-" + data["id"];
+        image.src = "/campaigns/" + data["id"] + "/image";
+        image.onload = function () {
+            loadImage(this);
+            imageCache[data["id"]] = image;
+        };
+        image.onerror = function () {
+            console.error("Failed to load image: " + image.src);
         }
-
-        this.style.position = 'fixed';
-        this.style.top = topp + "px";
-        this.style.left = leftp + "px";
-        this.height = newh;
-        this.width = neww;
-
-        $('#pic-container').empty().append(image);
-
-        //display container
-        $('#pic-container').css('display', 'block');
-
-        //postprocessing
-    };
-    image.onerror = function () {
-        console.error("Failed to load image: " + image.src);
+    } else {
+        //console.info("Load image from cache: " + data["id"]);
+        loadImage(image);
     }
+
+}
+
+function loadImage(image) {
+    //hide other container
+    $('#text-container').css('display', 'none');
+    $(document.body).css('background', 'black');
+    $(document.body).css('margin', '0px');
+
+    //init container
+    let wh = $(window).height();
+    let ww = $(window).width();
+    let ih = image.height;
+    let iw = image.width;
+    let newh = ih;
+    let neww = iw;
+    let topp = 0;
+    let leftp = 0;
+
+    if (wh / ww < ih / iw) {
+        // the frame is lower
+        newh = wh;
+        neww = newh / ih * iw;
+        leftp = (ww - neww) / 2;
+    } else {
+        // frame is higher
+        neww = ww;
+        newh = neww / iw * ih;
+        topp = (wh - newh) / 2;
+    }
+
+    image.style.position = 'fixed';
+    image.style.top = topp + "px";
+    image.style.left = leftp + "px";
+    image.height = newh;
+    image.width = neww;
+
+    $('#pic-container').empty().append(image);
+
+    //display container
+    $('#pic-container').css('display', 'block');
+
+    //postprocessing
 }
 
 function clearAllTimeouts() {

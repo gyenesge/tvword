@@ -23,7 +23,7 @@ public class IdokepDownloader {
     public final static String IMG_PREFIX = "/automata/zoldarnotert";
     public final static String FILE_PREFIX = "target/";
 
-    public final static long RETRY_SECS = 30;
+    public final static long RETRY_SECS = 55;
     public final static int RETRY_COUNT = 5;
 
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
@@ -31,26 +31,28 @@ public class IdokepDownloader {
     private String lastScheduledRun = null;
 
 
-    @Scheduled(cron = "0 2 0 ? * *")
-    public void downloadPictures() {
+    @Scheduled(cron = "0 55 23 ? * *")
+    public synchronized void downloadPictures() {
         log.info("Idokep: Start scheduled picture download.");
         List<String> imageUrls = null;
         for (int i = 0; i < RETRY_COUNT; i++) {
+            if (i != 0) {
+                log.info("No images found. Retrying in {} seconds.", RETRY_SECS);
+                try {
+                    this.wait(RETRY_SECS * 1000L);
+                } catch (InterruptedException e) {
+                    log.error("Retry period is interrupted.", e);
+                }
+            }
             imageUrls = getImageUrls();
 
             if (imageUrls != null)
                 break; // image URLs found.
-
-            log.info("No images found. Retrying in {} seconds.", RETRY_SECS);
-            try {
-                this.wait(RETRY_SECS * 1000L);
-            } catch (InterruptedException e) {
-                log.error("Retry period is interrupted.", e);
-            }
         }
 
         if (imageUrls == null) {
             //failed to get images: log and exit
+            log.error("The idokep server is not accessible. No images are downloaded.");
             logList.add(FORMATTER.format(LocalDateTime.now()) + ": failed to get image URLs today.");
             return;
         }
